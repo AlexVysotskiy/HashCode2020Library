@@ -1,11 +1,7 @@
 import common.*
-import solver.ArtemSolver
-import solver.bruteforce.RandomSolver
-import solver.bruteforce.RandomSolverOptimized
 import solver.greedy.GreedySolver
-import solver.horiz.HorizSolver
-import uploader.optimizer.RandomOneOptimizer
 import uploader.Uploader
+import uploader.optimizer.RandomOneOptimizer
 
 fun executeSolver(inputs: List<InputFile>, solverFactory: () -> Solver) {
     val name = solverFactory().name
