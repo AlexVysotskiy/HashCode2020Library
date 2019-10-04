@@ -1,5 +1,5 @@
 import common.*
-import solver.greedy.GreedySolver
+import solver.other.OtherSolver
 import uploader.Uploader
 import uploader.optimizer.RandomOneOptimizer
 
@@ -18,6 +18,7 @@ fun executeSolver(inputs: List<InputFile>, solverFactory: () -> Solver) {
 
         val inputFile = inp.toFile()
         val input = Reader.readInput(inputFile.inputStream())
+        println(input)
         val output = solver.solve(input)
 
         val optimizer = RandomOneOptimizer()
@@ -46,16 +47,14 @@ fun executeSolver(inputs: List<InputFile>, solverFactory: () -> Solver) {
 fun main(args: Array<String>) {
 
     val solvers = listOf<() -> Solver>(
-        { GreedySolver() }
-//        { GreedySolver() },
-//        { GreedySolver() }
+        { OtherSolver() }
     )
 
     val inputFiles = listOf(
+        InputFile("inputs/a_example.in", "0")
 //        InputFile("inputs/b_lovely_landscapes.txt", "5239399268745216"),
 //        InputFile("inputs/c_memorable_moments.txt", "5185683152961536")
 //        InputFile("inputs/d_pet_pictures.txt", "6378347655331840")
-        InputFile("inputs/e_shiny_selfies.txt", "4834468208574464")
     )
 
     solvers.forEach {
