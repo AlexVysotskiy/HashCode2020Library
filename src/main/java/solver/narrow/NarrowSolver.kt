@@ -58,8 +58,18 @@ class NarrowSolver(override val name: String = "Narrow") : Solver {
                 }
             }
 
-        // TODO: add q evenly on servers by dependencies
-        // TODO: add c evenly on servers by dependencies
+        // round-robin all Qs
+        var currentServer = 0L
+        q.forEach {
+            compilationSteps.add(CompilationStep(it.name, currentServer))
+            currentServer = (currentServer + 1) % serverCount
+        }
+
+        // round-robin all Cs
+        c.forEach {
+            compilationSteps.add(CompilationStep(it.name, currentServer))
+            currentServer = (currentServer + 1) % serverCount
+        }
 
         return Output(compilationSteps)
     }

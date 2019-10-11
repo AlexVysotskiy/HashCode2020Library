@@ -1,11 +1,11 @@
 import common.InputFile
 import common.Solver
-import solver.other.OtherSolver
+import solver.narrow.NarrowSolver
 
 fun main(args: Array<String>) {
 
     val solvers = listOf<() -> Solver>(
-        { OtherSolver() }
+        { NarrowSolver() }
     )
 
     val inputFiles = listOf(

@@ -13,7 +13,7 @@ class ResultCalculator {
         output
             .compilationSteps
             .forEach {
-                val filesOnTheServer = servers.getOrPut(it.serverIndex) { arrayListOf() }
+                val filesOnTheServer = servers.getOrPut(it.serverIndex.toInt()) { arrayListOf() }
                 filesOnTheServer.add(files[it.name]!!)
             }
 
