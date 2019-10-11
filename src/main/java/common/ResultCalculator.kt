@@ -25,7 +25,7 @@ class ResultCalculator {
                 }
             }
 
-        val maxDeadline = input.targets.maxBy { it.deadline }!!.deadline
+        val maxDeadline = input.targets.values.maxBy { it.deadline }!!.deadline
 
         for (time in 0 until maxDeadline) {
 
