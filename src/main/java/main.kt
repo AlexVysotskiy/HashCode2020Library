@@ -11,7 +11,7 @@ fun main(args: Array<String>) {
     val inputFiles = listOf(
         InputFile("inputs/a_example.in", "0")
 //        InputFile("inputs/b_lovely_landscapes.txt", "5239399268745216"),
-//        InputFile("inputs/c_memorable_moments.txt", "5185683152961536")
+//        InputFile("inputs/c_urgent.txt", "0")
 //        InputFile("inputs/d_pet_pictures.txt", "6378347655331840")
     )
 
