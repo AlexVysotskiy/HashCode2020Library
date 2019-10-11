@@ -1,7 +1,7 @@
 package common.model
 
 data class Node(
-    val name: String?,
+    val name: String,
     val compilation: Long,
     val replication: Long,
     val dependencies: List<Node>

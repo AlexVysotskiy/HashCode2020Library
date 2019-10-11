@@ -2,5 +2,5 @@ package common
 
 
 class Output(
-    val list: List<Unit>
+    val compilationSteps: List<Unit>
 )

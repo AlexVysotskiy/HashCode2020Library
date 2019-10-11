@@ -1,16 +1,12 @@
 package uploader.optimizer
 
-import com.vdurmont.etaprinter.ETAPrinter
 import common.Input
 import common.Output
-import common.ResultCalculatorOptimized
-import java.lang.Math.min
 import java.util.*
 
 class RandomOneOptimizer {
 
     private val random = Random()
-    private val calculator = ResultCalculatorOptimized()
 
     private class ToSwap(
         val first: Int,
