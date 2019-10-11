@@ -1,14 +1,14 @@
 package common
 
-import common.model.Node
+import common.model.FileNode
 
 class ResultCalculator {
 
     fun calculateResult(input: Input, output: Output): Long {
         val files = input.nodes
-        val servers = hashMapOf<Int, MutableList<Node>>()
+        val servers = hashMapOf<Int, MutableList<FileNode>>()
 
-        val replicatedTime = hashMapOf<Node, Int?>()
+        val replicatedTime = hashMapOf<FileNode, Int?>()
 
         output
             .compilationSteps

@@ -1,6 +1,6 @@
 package common
 
-import common.model.Node
+import common.model.FileNode
 import common.model.TargetValue
 import java.io.BufferedReader
 import java.io.InputStream
@@ -15,7 +15,7 @@ object Reader {
         val bufferReader = BufferedReader(InputStreamReader(file))
         val stringTokenizer = StringTokenizer(bufferReader.readLine())
 
-        val nodes = HashMap<String, Node>()
+        val nodes = HashMap<String, FileNode>()
 
         val files = parseLong(stringTokenizer.nextToken())
         val targets = parseLong(stringTokenizer.nextToken())
@@ -27,7 +27,7 @@ object Reader {
             val compilation = parseLong(stringTokenizer.nextToken())
             val replication = parseLong(stringTokenizer.nextToken())
 
-            val dependencies = mutableListOf<Node>()
+            val dependencies = mutableListOf<FileNode>()
             val depsTokenizer = StringTokenizer(bufferReader.readLine())
             val depNum = parseLong(depsTokenizer.nextToken())
             for (j in 0 until depNum) {
@@ -36,7 +36,7 @@ object Reader {
                 dependencies.add(dependency)
             }
 
-            val node = Node(
+            val node = FileNode(
                 name = name,
                 compilation = compilation,
                 replication = replication,

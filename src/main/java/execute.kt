@@ -22,7 +22,7 @@ fun executeSolver(inputs: List<InputFile>, solverFactory: () -> Solver) {
 
         println("Score for $inputFile = $score")
 
-        // Writer.write(output, File("$inputFile.out").outputStream())
+        // Writer.write(output, FileNode("$inputFile.out").outputStream())
 
         results.add(inp to output)
 
