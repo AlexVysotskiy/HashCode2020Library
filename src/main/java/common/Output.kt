@@ -1,6 +1,8 @@
 package common
 
+import common.model.CompilationStep
+
 
 class Output(
-    val compilationSteps: List<Unit>
+    val compilationSteps: List<CompilationStep>
 )
