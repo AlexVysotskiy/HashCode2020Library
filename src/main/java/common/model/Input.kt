@@ -5,7 +5,9 @@ data class FileNode(
     val compilation: Long,
     val replication: Long,
     val dependencies: List<FileNode>
-)
+) {
+    val parents: List<FileNode> = mutableListOf()
+}
 
 data class TargetValue(
     val name: String,

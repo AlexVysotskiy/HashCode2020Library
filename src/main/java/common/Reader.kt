@@ -42,10 +42,13 @@ object Reader {
                 replication = replication,
                 dependencies = dependencies
             )
+            dependencies.forEach {
+                (it.parents as MutableList<FileNode>).add(node)
+            }
             nodes[name] = node
         }
 
-        val goals = mutableListOf<TargetValue>()
+        val goals = mutableMapOf<String, TargetValue>()
         for (i in 0 until targets) {
             val stringTokenizer = StringTokenizer(bufferReader.readLine())
             val name = stringTokenizer.nextToken()
@@ -57,7 +60,7 @@ object Reader {
                 deadline = deadline,
                 goal = goal
             )
-            goals.add(target)
+            goals[name] = target
         }
 
         return Input(
