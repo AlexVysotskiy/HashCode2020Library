@@ -1,5 +1,5 @@
 import common.*
-import common.score.ResultCalculator
+import common.score.ScoreCalculator
 import uploader.Uploader
 import java.io.File
 
@@ -9,7 +9,7 @@ fun executeSolver(inputs: List<InputFile>, solverFactory: () -> Solver) {
 
     println("Checking solution [$name]")
 
-    val resultCalculator = ResultCalculator()
+    val resultCalculator = ScoreCalculator()
 
     val results = mutableListOf<Pair<InputFile, Output>>()
 

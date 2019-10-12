@@ -8,7 +8,7 @@ import common.model.TargetValue
 import common.score.trace.writeChromeTrace
 import me.tongfei.progressbar.ProgressBar
 
-class ResultCalculator {
+class ScoreCalculator {
 
     private lateinit var storeOfCompiledFiles: Store
 
