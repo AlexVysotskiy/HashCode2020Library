@@ -5,6 +5,7 @@ import common.Output
 import common.model.CompilationStep
 import common.model.FileNode
 import common.model.TargetValue
+import common.score.trace.writeChromeTrace
 import kotlinx.serialization.ImplicitReflectionSerializer
 import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
@@ -47,41 +48,8 @@ class ResultCalculator {
         return storeOfCompiledFiles.resultScore
     }
 
-    @UseExperimental(ImplicitReflectionSerializer::class, UnstableDefault::class)
     fun writeTrace(path: String) {
-        val json = Json(JsonConfiguration.Default)
-
-        val targetNames = targets.map { it.name }.toHashSet()
-        val traceEvents = mutableListOf<TraceEvent>()
-
-        computationNodes.forEach { node ->
-            node.traceEvents.forEach {
-                val isTarget = it.fileNode.name in targetNames
-                traceEvents += TraceEvent(
-                    pid = 0,
-                    tid = node.serverIndex,
-                    ph = Phase.DurationStart,
-                    name = it.fileNode.name,
-                    ts = it.compilationBegin.toDouble(),
-                    cname = if (isTarget) "bad" else "good",
-                    cat = if (isTarget) "target" else "node"
-                )
-                traceEvents += TraceEvent(
-                    pid = 0,
-                    tid = node.serverIndex,
-                    ph = Phase.DurationEnd,
-                    name = it.fileNode.name,
-                    ts = it.compilationEnd.toDouble()
-                )
-            }
-        }
-
-        val traceRoot = TraceRoot(
-            traceEvents = traceEvents,
-            displayTimeUnit = TimeUnit.MILLISECONDS
-        )
-
-        File(path).writeText(json.stringify(traceRoot))
+        writeChromeTrace(computationNodes, targets, path)
     }
 
     private fun loopAllComputationNodes(computationNodes: List<ComputationNode>, timeTick: Long) {

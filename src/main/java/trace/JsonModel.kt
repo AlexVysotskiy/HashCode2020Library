@@ -43,7 +43,12 @@ Context Events
 sealed class Phase(val ph: String) {
     object DurationStart : Phase("B")
     object DurationEnd : Phase("E")
+    object AsyncStart : Phase("b")
+    object AsyncEnd : Phase("e")
     object Complete : Phase("X")
+    object FlowStart : Phase("s")
+    object FlowStep : Phase("t")
+    object FlowEnd : Phase("f")
     object Instant : Phase("i")
     object Counter : Phase("C")
     object Metadata : Phase("M")
@@ -60,6 +65,7 @@ data class TraceEvent(
     val tid: Long,
     val dur: Double? = null,
 
+    val id: Long? = null,
     val args: (Map<String, String>?) = null,
     val cname: String? = null,
     val tts: Double? = null,

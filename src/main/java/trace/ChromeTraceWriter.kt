@@ -1,4 +1,0 @@
-package trace
-
-class ChromeTraceWriter {
-}
