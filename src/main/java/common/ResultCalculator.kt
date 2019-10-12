@@ -16,9 +16,9 @@ class ResultCalculator {
         files = input.nodes
         serverCount = input.servers
         compilationSteps = output.compilationSteps
-        storeOfCompiledFiles = Store(input.targets)
+        storeOfCompiledFiles = Store(input.targets.values.toList())
 
-        val maxDeadline = input.targets.maxBy { it.deadline }!!.deadline
+        val maxDeadline = input.targets.values.maxBy { it.deadline }!!.deadline
 
         val computationNodes = createComputationNodes()
         for (timeTick in 0..maxDeadline) {
