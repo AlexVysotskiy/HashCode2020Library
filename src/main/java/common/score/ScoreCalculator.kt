@@ -6,17 +6,7 @@ import common.model.CompilationStep
 import common.model.FileNode
 import common.model.TargetValue
 import common.score.trace.writeChromeTrace
-import kotlinx.serialization.ImplicitReflectionSerializer
-import kotlinx.serialization.UnstableDefault
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
-import kotlinx.serialization.stringify
 import me.tongfei.progressbar.ProgressBar
-import trace.Phase
-import trace.TraceEvent
-import trace.TraceRoot
-import java.io.File
-import java.util.concurrent.TimeUnit
 
 class ResultCalculator {
 
@@ -39,7 +29,7 @@ class ResultCalculator {
         val maxDeadline = input.targets.values.maxBy { it.deadline }!!.deadline
 
         this.computationNodes = createComputationNodes()
-        for (timeTick in ProgressBar.wrap((0..maxDeadline).toList(), "Ticks")) {
+        for (timeTick in ProgressBar.wrap((0..(maxDeadline + 1000)).toList(), "Ticks")) {
             // We should collect already finished files (potential deps for current tick)
             loopAllComputationNodes(computationNodes, timeTick)
             loopAllComputationNodes(computationNodes, timeTick)
@@ -49,7 +39,7 @@ class ResultCalculator {
     }
 
     fun writeTrace(path: String) {
-        writeChromeTrace(computationNodes, targets, path)
+        writeChromeTrace(files.values.toList(), computationNodes, targets, path)
     }
 
     private fun loopAllComputationNodes(computationNodes: List<ComputationNode>, timeTick: Long) {
