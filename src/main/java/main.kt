@@ -9,10 +9,12 @@ fun main(args: Array<String>) {
     )
 
     val inputFiles = listOf(
-        InputFile("inputs/a_example.in", "0")
-//        InputFile("inputs/b_lovely_landscapes.txt", "5239399268745216"),
-//        InputFile("inputs/c_urgent.txt", "0")
-//        InputFile("inputs/d_pet_pictures.txt", "6378347655331840")
+        InputFile("inputs/a_example.in", "0"),
+        InputFile("inputs/b_narrow.in", "0"),
+        InputFile("inputs/c_urgent.in", "0"),
+        InputFile("inputs/d_typical.in", "0"),
+        InputFile("inputs/e_intriguing.in", "0"),
+        InputFile("inputs/f_big.in", "0")
     )
 
     solvers.forEach {

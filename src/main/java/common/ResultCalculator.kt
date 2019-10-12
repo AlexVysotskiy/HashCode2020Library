@@ -3,6 +3,8 @@ package common
 import common.model.CompilationStep
 import common.model.FileNode
 import common.model.TargetValue
+import me.tongfei.progressbar.ProgressBar
+
 
 class ResultCalculator {
 
@@ -21,7 +23,7 @@ class ResultCalculator {
         val maxDeadline = input.targets.values.maxBy { it.deadline }!!.deadline
 
         val computationNodes = createComputationNodes()
-        for (timeTick in 0..maxDeadline) {
+        for (timeTick in ProgressBar.wrap((0..maxDeadline).toList(), "Ticks")) {
             // We should collect already finished files (potential deps for current tick)
             loopAllComputationNodes(computationNodes, timeTick)
             loopAllComputationNodes(computationNodes, timeTick)
