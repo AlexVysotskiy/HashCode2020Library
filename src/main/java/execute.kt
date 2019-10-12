@@ -1,4 +1,5 @@
 import common.*
+import common.score.ResultCalculator
 import uploader.Uploader
 import java.io.File
 
@@ -20,6 +21,7 @@ fun executeSolver(inputs: List<InputFile>, solverFactory: () -> Solver) {
 
         val output = solver.solve(input)
         val score = resultCalculator.calculateResult(input, output)
+        resultCalculator.writeTrace("$inputFile.trace.json")
 
         println("Score for $inputFile = $score")
 

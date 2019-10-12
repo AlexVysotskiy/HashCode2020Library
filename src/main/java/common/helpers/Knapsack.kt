@@ -39,7 +39,7 @@ object Knapsack {
             i++
         }
 
-        // stores the result of Knapsack
+        // stores the score of Knapsack
         var res = K[n][W]
 
         w = W
@@ -47,7 +47,7 @@ object Knapsack {
         val list = mutableListOf<KnapsackItem<T>>()
         while (i > 0 && res > 0) {
 
-            // either the result comes from the top
+            // either the score comes from the top
             // (K[i-1][w]) or from (val[i-1] + K[i-1]
             // [w-wt[i-1]]) as in Knapsack table. If
             // it comes from the latter one/ it means

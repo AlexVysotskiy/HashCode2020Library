@@ -1,7 +1,7 @@
 package common
 
 import common.model.CompilationStep
-import common.model.FileNode
+import common.score.ResultCalculator
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.IsEqual
 import org.junit.Test

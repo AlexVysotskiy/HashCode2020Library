@@ -27,9 +27,9 @@ class RandomOneOptimizer {
 //            val slideToMove = random.nextInt(mutableSlides.size)
 //            val theBestSwap = (0 until mutableSlides.size).map { currIndex ->
 //                mutableSlides.swap(currIndex, slideToMove)
-//                val result = calculator.calculateResult(input, newOutput)
+//                val score = calculator.calculateResult(input, newOutput)
 //                mutableSlides.swap(slideToMove, currIndex)
-//                result to ToSwap(currIndex, slideToMove)
+//                score to ToSwap(currIndex, slideToMove)
 //            }.maxBy { it.first }!!.second
 //
 //            mutableSlides.swap(theBestSwap.first, theBestSwap.second)
