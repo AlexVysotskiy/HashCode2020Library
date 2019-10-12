@@ -20,11 +20,15 @@ class NarrowSolver(override val name: String = "Narrow") : Solver {
         val a = hashSetOf<FileNode>() // 50 "a"
 
         input.nodes
-            .forEach { (_, node) ->
-                if (node.dependencies.size > 1) { // 50 "c" with 100 dependencies
-                    c.add(node)
-                }
+            .values
+            .filter { it.dependencies.size > 1 } // 50 "c" targets with 100 dependencies
+            .sortedBy {
+                val depsSum = it.dependencies.sumBy { fileNode -> fileNode.compilation.toInt() }
+                (input.targets[it.name]?.goal ?: -100) - depsSum
             }
+            .reversed()
+            .take(35)
+            .forEach { node -> c.add(node) }
 
         c.forEach {
             it.dependencies.forEach { cDependency ->

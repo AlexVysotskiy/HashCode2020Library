@@ -29,7 +29,7 @@ class ResultCalculator {
         val maxDeadline = input.targets.values.maxBy { it.deadline }!!.deadline
 
         this.computationNodes = createComputationNodes()
-        for (timeTick in ProgressBar.wrap((0..(maxDeadline + 1000)).toList(), "Ticks")) {
+        for (timeTick in ProgressBar.wrap((0..(maxDeadline)).toList(), "Ticks")) {
             // We should collect already finished files (potential deps for current tick)
             loopAllComputationNodes(computationNodes, timeTick)
             loopAllComputationNodes(computationNodes, timeTick)
