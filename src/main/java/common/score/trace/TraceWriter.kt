@@ -43,13 +43,13 @@ fun writeChromeTrace(
                 ph = Phase.DurationStart,
                 name = traceEvent.fileNode.name,
                 ts = traceEvent.compilationBegin.toDouble(),
-                cname = if (isTarget) "bad" else "good",
                 cat = if (isTarget) "target" else "node",
                 args = mapOf(
                     "replicationTime" to traceEvent.fileNode.replication.toString(),
                     "compilationTime" to traceEvent.fileNode.compilation.toString(),
                     "isTarget" to isTarget.toString(),
                     "dependenciesCount" to traceEvent.fileNode.dependencies.size.toString(),
+                    "dependencies" to traceEvent.fileNode.dependencies.joinToString { it.name },
                     "parentsCount" to traceEvent.fileNode.parents.size.toString()
                 )
             )
@@ -57,6 +57,7 @@ fun writeChromeTrace(
                 pid = 0,
                 tid = node.serverIndex,
                 ph = Phase.DurationEnd,
+                cname = if (isTarget) "bad" else "good",
                 name = traceEvent.fileNode.name,
                 ts = traceEvent.compilationEnd.toDouble()
             )
