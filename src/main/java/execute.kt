@@ -1,5 +1,6 @@
 import common.*
 import uploader.Uploader
+import java.io.File
 
 fun executeSolver(inputs: List<InputFile>, solverFactory: () -> Solver) {
     val name = solverFactory().name
@@ -22,7 +23,7 @@ fun executeSolver(inputs: List<InputFile>, solverFactory: () -> Solver) {
 
         println("Score for $inputFile = $score")
 
-        // Writer.write(output, FileNode("$inputFile.out").outputStream())
+        Writer.write(output, File("$inputFile.out").outputStream())
 
         results.add(inp to output)
 
