@@ -13,18 +13,18 @@ class NarrowSolver(override val name: String = "Narrow") : Solver {
 
         val serverCount = input.servers
 
-        val c = hashSetOf<FileNode>()
+        // "c" -> "q" -> "r" -> "a"
+        val c = hashSetOf<FileNode>() // 50 "c" with 100 dependencies
+        val q = hashSetOf<FileNode>() // 5000 "q"
+        val r = hashSetOf<FileNode>() // 50 "r"
+        val a = hashSetOf<FileNode>() // 50 "a"
 
         input.nodes
             .forEach { (_, node) ->
-                if (node.dependencies.size > 1) { // 100 dependencies
+                if (node.dependencies.size > 1) { // 50 "c" with 100 dependencies
                     c.add(node)
                 }
             }
-
-        val q = hashSetOf<FileNode>()
-        val r = hashSetOf<FileNode>()
-        val a = hashSetOf<FileNode>()
 
         c.forEach {
             it.dependencies.forEach { cDependency ->
@@ -36,8 +36,8 @@ class NarrowSolver(override val name: String = "Narrow") : Solver {
             }
         }
 
-        r.forEach {
-            it.dependencies.forEach {
+        r.forEach { rNode ->
+            rNode.dependencies.forEach {
                 a.add(it)
             }
         }
