@@ -10,7 +10,7 @@ fun main(args: Array<String>) {
     )
 
     val inputFiles = listOf(
-//        InputFile("inputs/a_example.in", "0"),
+        InputFile("inputs/a_example.in", "0"),
         InputFile("inputs/b_narrow.in", "0")
 //        InputFile("inputs/c_urgent.in", "0"),
 //        InputFile("inputs/d_typical.in", "0"),
