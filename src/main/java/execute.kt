@@ -1,5 +1,6 @@
 import common.*
-import common.score.ScoreCalculator
+import common.score.kotlin.KotlinScoreCalculator
+import common.score.python.PythonScoreCalculator
 import uploader.Uploader
 import java.io.File
 
@@ -9,7 +10,8 @@ fun executeSolver(inputs: List<InputFile>, solverFactory: () -> Solver) {
 
     println("Checking solution [$name]")
 
-    val resultCalculator = ScoreCalculator()
+    val resultCalculator = KotlinScoreCalculator()
+    val pythonCalculator = PythonScoreCalculator()
 
     val results = mutableListOf<Pair<InputFile, Output>>()
 
@@ -20,12 +22,17 @@ fun executeSolver(inputs: List<InputFile>, solverFactory: () -> Solver) {
         val input = Reader.readInput(inputFile.inputStream())
 
         val output = solver.solve(input)
+        val outputFile = File("$inputFile.out")
+        Writer.write(output, outputFile.outputStream())
+
         val score = resultCalculator.calculateResult(input, output)
+        val pythonScore = pythonCalculator.calculateResult(inputFile, outputFile)
+
         resultCalculator.writeTrace("$inputFile.trace.json")
 
         println("Score for $inputFile = $score (max sum goals = ${input.targets.values.sumBy { it.goal.toInt() }})")
+        println("Python score = $pythonScore")
 
-        Writer.write(output, File("$inputFile.out").outputStream())
 
         results.add(inp to output)
 

@@ -1,8 +1,8 @@
-package common.score.trace
+package common.score.kotlin.trace
 
 import common.model.FileNode
 import common.model.TargetValue
-import common.score.ComputationNode
+import common.score.kotlin.ComputationNode
 import kotlinx.serialization.ImplicitReflectionSerializer
 import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json

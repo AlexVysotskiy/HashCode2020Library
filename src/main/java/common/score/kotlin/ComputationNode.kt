@@ -1,7 +1,7 @@
-package common.score
+package common.score.kotlin
 
 import common.model.FileNode
-import common.score.trace.ComputationTraceEvent
+import common.score.kotlin.trace.ComputationTraceEvent
 
 data class ComputationNode(
     val serverIndex: Long,

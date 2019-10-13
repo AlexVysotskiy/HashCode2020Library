@@ -1,14 +1,15 @@
-package common.score
+package common.score.kotlin
 
 import common.Input
 import common.Output
+import common.ScoreCalculator
 import common.model.CompilationStep
 import common.model.FileNode
 import common.model.TargetValue
-import common.score.trace.writeChromeTrace
+import common.score.kotlin.trace.writeChromeTrace
 import me.tongfei.progressbar.ProgressBar
 
-class ScoreCalculator {
+class KotlinScoreCalculator : ScoreCalculator {
 
     private lateinit var storeOfCompiledFiles: Store
 
@@ -19,7 +20,7 @@ class ScoreCalculator {
     private lateinit var computationNodes: List<ComputationNode>
     private lateinit var targets: List<TargetValue>
 
-    fun calculateResult(input: Input, output: Output): Long {
+    override fun calculateResult(input: Input, output: Output): Long {
         files = input.nodes
         serverCount = input.servers
         compilationSteps = output.compilationSteps

@@ -1,4 +1,4 @@
-package common.score
+package common.score.kotlin
 
 import common.model.FileNode
 import common.model.TargetValue
