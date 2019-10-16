@@ -26,12 +26,12 @@ fun executeSolver(inputs: List<InputFile>, solverFactory: () -> Solver) {
         Writer.write(output, outputFile.outputStream())
 
         val score = resultCalculator.calculateResult(input, output)
-        val pythonScore = pythonCalculator.calculateResult(inputFile, outputFile)
+//        val score = pythonCalculator.calculateResult(inputFile, outputFile)
 
         resultCalculator.writeTrace("$inputFile.trace.json")
 
         println("Score for $inputFile = $score (max sum goals = ${input.targets.values.sumBy { it.goal.toInt() }})")
-        println("Python score = $pythonScore")
+//        println("Python score = $pythonScore")
 
 
         results.add(inp to output)

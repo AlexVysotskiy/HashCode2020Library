@@ -11,7 +11,7 @@ class PythonScoreCalculator {
         val workingDirectory = File("external_calculator")
 
         val score = "python3 score.py $inputFilePath $outputFilePath".runCommand(workingDirectory)
-        return score.trim().toLong()
+        return score.trim().toLongOrNull() ?: -1
     }
 
     private fun String.runCommand(workingDir: File): String {

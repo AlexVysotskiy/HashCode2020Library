@@ -4,7 +4,7 @@ import common.model.FileNode
 import common.model.TargetValue
 
 class Store(private val targets: List<TargetValue>) {
-    private val compiledTasks: MutableList<Task> = mutableListOf()
+    private val compiledTasks: MutableMap<String, MutableSet<Task>> = hashMapOf()
 
     var resultScore = 0L
         private set
@@ -15,7 +15,7 @@ class Store(private val targets: List<TargetValue>) {
             val depName = it.name
 
             // The same file can be compiled on different servers
-            val compiledDeps = compiledTasks.filter { it.fileNode.name == depName }
+            val compiledDeps = compiledTasks[depName] ?: emptySet<Task>()
 
             // We need to check each compiled task even it's the same file
             compiledDeps.forEach { compiledDep ->
@@ -28,7 +28,7 @@ class Store(private val targets: List<TargetValue>) {
     }
 
     fun addCompiledTask(task: Task) {
-        compiledTasks.add(task)
+        compiledTasks.getOrPut(task.fileNode.name) { hashSetOf() } += task
         resultScore += calculateScore(task)
     }
 
@@ -39,12 +39,6 @@ class Store(private val targets: List<TargetValue>) {
             0
         } else {
             target.deadline - task.timeOfFinishCompiling + target.goal
-        }
-    }
-
-    fun printDebug() {
-        compiledTasks.forEach {
-            System.out.println("${it.fileNode.name}: time=${it.timeOfFinishCompiling}, repl=${it.timeOfGlobalAvailability}")
         }
     }
 }
