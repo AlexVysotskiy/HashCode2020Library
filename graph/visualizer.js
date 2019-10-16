@@ -4,7 +4,7 @@ function showGraph(text) {
     var lines = text.split('\n')
     var filesNum = parseInt(lines[0].split(' ')[0])
     var graph = {}
-    for (var i = 0; i < filesNum; i++) {
+    for (let i = 0; i < filesNum; i++) {
         var line = lines[i * 2 + 1];
         var name = line.split(' ')[0];
         var deps = lines[i * 2 + 2].split(' ').slice(1);
@@ -16,6 +16,7 @@ function showGraph(text) {
     var targetIndex = filesNum * 2 + 1;
     var targetNum = 4
 
+    var targets = []
     function add(name) {
         var deps = graph[name]
         deps.forEach((it) => {
@@ -23,14 +24,13 @@ function showGraph(text) {
             add(it)
         })
     }
-    var targets = [
-        lines[targetIndex + targetNum].split(' ')[0],
-        lines[targetIndex + targetNum - 1].split(' ')[0],
-        lines[targetIndex + targetNum - 2].split(' ')[0],
-        lines[targetIndex + targetNum - 3].split(' ')[0],
-        lines[targetIndex + targetNum - 4].split(' ')[0],
-    ]
-    targets.forEach((it) => add(it))
+    for (let i = targetIndex; i < lines.length; i++) {
+        var name = lines[i].split(' ')[0]
+        if (name.length != 0) {
+            targets.push(name)
+            add(name)
+        }
+    }
 
     // specify where it should be rendered:
     var graphics = Viva.Graph.View.webglGraphics();
