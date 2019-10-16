@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Visualizer</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vivagraphjs/0.10.1/vivagraph.js"></script>
+    <script src="visualizer.js"></script>
+
+    <style>
+        html, body, #graph, svg {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+        }
+        #graph, input {
+            position: absolute;
+        }
+    </style>
+</head>
+<body>
+    <div id="graph"></div>
+    <input type="file" id="file-input" />
+
+    <script type="text/javascript">
+        function readSingleFile(e) {
+          var file = e.target.files[0];
+          if (!file) {
+            return;
+          }
+          var reader = new FileReader();
+          reader.onload = function(e) {
+            var contents = e.target.result;
+            displayContents(contents);
+          };
+          reader.readAsText(file);
+        }
+
+        function displayContents(text) {
+            showGraph(text)
+        }
+
+        document.getElementById('file-input')
+            .addEventListener('change', readSingleFile, false);
+    </script>
+</body>
+</html>
