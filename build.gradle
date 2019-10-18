@@ -21,6 +21,7 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     compile "org.jetbrains.kotlin:kotlin-reflect"
     compile "me.tongfei:progressbar:0.7.4"
+    compile "io.reactivex.rxjava3:rxjava:3.0.0-RC3"
     compile "org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.11.1"
 
     testCompile group: 'org.hamcrest', name: 'hamcrest-junit', version: '2.0.0.0'
