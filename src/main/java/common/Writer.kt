@@ -7,14 +7,12 @@ object Writer {
     fun write(output: Output, outputStream: OutputStream) {
         val writer = outputStream.bufferedWriter()
 
-        writer.write(output.compilationSteps.size.toString())
+        writer.write(output.types.size.toString())
         writer.newLine()
 
-        output.compilationSteps.forEach { compilationStep ->
-            writer.write(compilationStep.name)
+        output.types.forEach { type ->
+            writer.write(type)
             writer.write(" ")
-            writer.write(compilationStep.serverIndex.toString())
-            writer.newLine()
         }
 
         writer.flush()

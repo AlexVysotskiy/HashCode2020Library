@@ -28,7 +28,9 @@ function showGraph(text) {
         var name = lines[i].split(' ')[0]
         if (name.length != 0) {
             targets.push(name)
-            add(name)
+            if (i - targetIndex < 30) {
+                add(name)
+            }
         }
     }
 
