@@ -25,9 +25,7 @@ fun executeSolver(inputs: List<InputFile>, solverFactory: () -> Solver) {
 
         val score = resultCalculator.calculateResult(input, output)
 
-        resultCalculator.writeTrace("$inputFile.trace.json")
-
-        println("Score for $inputFile = $score (max sum goals = ${input.targets.values.sumBy { it.goal.toInt() }})")
+        println("Score for $inputFile = $score")
 
         results.add(inp to output)
 
