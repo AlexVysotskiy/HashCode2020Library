@@ -11,7 +11,7 @@ object Writer {
         writer.newLine()
 
         output.types.forEach { type ->
-            writer.write(type)
+            writer.write(type.toString())
             writer.write(" ")
         }
 
