@@ -12,6 +12,7 @@ object Writer {
 
         output.types.forEach { type ->
             writer.write(type)
+            writer.write(" ")
         }
 
         writer.flush()
