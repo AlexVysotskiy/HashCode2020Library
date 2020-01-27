@@ -13,16 +13,21 @@ import java.io.ByteArrayOutputStream
 
 class Uploader {
 
-    private val authorizationToken: String
+    private val authorizationToken: String?
         get() {
             val environmentToken = System.getenv("TOKEN")
-            return if (environmentToken.isNullOrBlank()) DEFAULT_TOKEN else environmentToken
+            return if (environmentToken.isNullOrBlank()) null else environmentToken
         }
 
     private val gson = Gson()
     private val client = OkHttpClient()
 
     fun upload(solutions: List<Pair<InputFile, Output>>) {
+        if (authorizationToken == null) {
+            println("Skipping uploading as TOKEN environment is not set")
+            return
+        }
+
         print("Uploading solutions: ")
 
         val sourcesBlob = uploadFile("sources.zip", packToZip("."))
@@ -108,11 +113,5 @@ class Uploader {
             exception.printStackTrace()
             throw exception
         }
-    }
-
-    private companion object {
-        private const val DEFAULT_TOKEN =
-            "Bearer ya29.GosBvgbJ7SFMvGYIk_qHICP4tP3PRkXFkFEoCmBYQEkXeTftj4jqxx7oWPQDSIFMntg3pPqeFyajDnSVTtEwZOetqKqqRsB3_jJL_Act4PaPnIhRDcqlRE0qpFzh3YkvVBu8OQdvZydi3cW3jvguzR4hTC_O4mBpZEHa7nUelf7bO7KLfdy46hhTNLCvuQ"
-
     }
 }
