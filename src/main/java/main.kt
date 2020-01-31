@@ -1,13 +1,11 @@
 import common.InputFile
 import common.Solver
 import solver.lukaville.GreedySolver
-import solver.shikasd.KnapsackSolver
 
 fun main(args: Array<String>) {
 
     val solvers = listOf<() -> Solver>(
-        { GreedySolver() },
-        { KnapsackSolver() }
+        { GreedySolver() }
     )
 
     val inputFiles = listOf(

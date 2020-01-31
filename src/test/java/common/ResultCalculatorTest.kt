@@ -1,6 +1,5 @@
 package common
 
-import common.model.CompilationStep
 import common.score.kotlin.ScoreCalculatorImpl
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.IsEqual
@@ -17,7 +16,7 @@ class ResultCalculatorTest {
 
         val result = calculator.calculateResult(input, output)
 
-        assertThat(result, IsEqual(60L))
+        assertThat(result, IsEqual(10L))
     }
 
     private fun createInput(): Input =
@@ -30,13 +29,9 @@ class ResultCalculatorTest {
     private fun createOutput(): Output {
         return Output(
             listOf(
-                CompilationStep("c1", 1),
-                CompilationStep("c0", 0),
-                CompilationStep("c3", 1),
-                CompilationStep("c2", 0),
-                CompilationStep("c2", 1),
-                CompilationStep("c4", 0),
-                CompilationStep("c5", 1)
+                HandledRide(0, 1),
+                HandledRide(2, 2),
+                HandledRide(1, 2)
             )
         )
     }
