@@ -22,7 +22,9 @@ data class Ride(
 data class Point(
     val x: Int,
     val y: Int
-)
+) {
+    fun distanceTo(other: Point) = abs(x -  other.x) + abs(y - other.y)
+}
 
 data class Size(
     val width: Int,

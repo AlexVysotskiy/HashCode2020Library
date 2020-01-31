@@ -1,6 +1,6 @@
 import common.InputFile
 import common.Solver
-import solver.lukaville.GreedySolver
+import solver.shikasd.GreedySolver
 
 fun main(args: Array<String>) {
 
