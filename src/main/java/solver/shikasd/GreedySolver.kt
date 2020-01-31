@@ -16,7 +16,7 @@ class GreedySolver(override val name: String = "shikasd.GreedySolver") : Solver 
                 if (time > tick) return@forEachIndexed
                 val carPosition = carPositions[index]
 
-                val rides = sortedRides.asSequence().filter { (_, it) ->  it.endTime >= it.distance() + carPosition.distanceTo(it.start) + tick }
+                val rides = sortedRides.asSequence().filter { (_, it) -> it.endTime >= it.distance() + carPosition.distanceTo(it.start) + tick }
                 val availableRide = rides.minBy { carPosition.distanceTo(it.second.start) } ?: return@forEachIndexed
 
                 sortedRides.remove(availableRide)
@@ -26,6 +26,7 @@ class GreedySolver(override val name: String = "shikasd.GreedySolver") : Solver 
                 )
                 carPositions[index] = availableRide.second.end
             }
+            sortedRides.removeAll { it.second.endTime <= tick }
             tick++
         }
 
