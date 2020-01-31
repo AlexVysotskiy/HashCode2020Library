@@ -3,74 +3,17 @@ package common.score.kotlin
 import common.Input
 import common.Output
 import common.ScoreCalculator
-import common.model.CompilationStep
-import common.model.FileNode
-import common.model.TargetValue
-import common.score.kotlin.trace.writeChromeTrace
-import me.tongfei.progressbar.ProgressBar
 
 class KotlinScoreCalculator : ScoreCalculator {
 
-    private lateinit var storeOfCompiledFiles: Store
+    override fun calculateResult(input: Input, output: Output): Long =
+        output.types.sumByLong { input.slices[it].toLong() }
 
-    private lateinit var files: Map<String, FileNode>
-    private var serverCount: Long = 0
-    private lateinit var compilationSteps: List<CompilationStep>
-
-    private lateinit var computationNodes: List<ComputationNode>
-    private lateinit var targets: List<TargetValue>
-
-    override fun calculateResult(input: Input, output: Output): Long {
-        files = input.nodes
-        serverCount = input.servers
-        compilationSteps = output.compilationSteps
-        targets = input.targets.values.toList()
-        storeOfCompiledFiles = Store(targets)
-
-        val maxDeadline = input.targets.values.maxBy { it.deadline }!!.deadline
-
-        this.computationNodes = createComputationNodes()
-        for (timeTick in ProgressBar.wrap((0..(maxDeadline)).toList(), "Ticks")) {
-            // We should collect already finished files (potential deps for current tick)
-            loopAllComputationNodes(computationNodes, timeTick)
-            loopAllComputationNodes(computationNodes, timeTick)
+    private inline fun <T> Iterable<T>.sumByLong(selector: (T) -> Long): Long {
+        var sum: Long = 0
+        for (element in this) {
+            sum += selector(element)
         }
-
-        return storeOfCompiledFiles.resultScore
+        return sum
     }
-
-    fun writeTrace(path: String) {
-        writeChromeTrace(files.values.toList(), computationNodes, targets, path)
-    }
-
-    private fun loopAllComputationNodes(computationNodes: List<ComputationNode>, timeTick: Long) {
-        for (computationNode in computationNodes) {
-            if (computationNode.isBusy(timeTick) || computationNode.isShutdown) continue
-
-            computationNode.finishTaskIfPossible(timeTick)?.let { storeOfCompiledFiles.addCompiledTask(it) }
-
-            if (computationNode.queue.isEmpty()) {
-                computationNode.doShutdown()
-            } else {
-                val next = computationNode.queue.first()
-                if (storeOfCompiledFiles.checkDependencyAvailability(computationNode, next, timeTick)) {
-                    computationNode.proceedNext(timeTick)
-                }
-            }
-        }
-    }
-
-    private fun createComputationNodes(): List<ComputationNode> {
-        val computationNodes = mutableListOf<ComputationNode>()
-        (0..serverCount).map { serverIndex ->
-            val stepsForServer = compilationSteps.filter { it.serverIndex == serverIndex }
-            val filesForServer = getFileNodes(stepsForServer)
-            computationNodes.add(ComputationNode(serverIndex, filesForServer.toMutableList()))
-        }
-
-        return computationNodes
-    }
-
-    private fun getFileNodes(steps: List<CompilationStep>) =
-        steps.map { step -> files.values.find { node -> node.name == step.name }!! }
 }

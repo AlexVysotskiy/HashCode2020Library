@@ -1,23 +1,36 @@
 import common.InputFile
 import common.Solver
-import solver.narrow.NarrowSolver
-import solver.urgent.ConflictedUrgentSolver
+import solver.lukaville.GreedySolver
+import solver.shikasd.KnapsackSolver
 
 fun main(args: Array<String>) {
 
     val solvers = listOf<() -> Solver>(
-//        { NarrowSolver() }
-//        { UrgentSolver() }
-        { ConflictedUrgentSolver() }
+        { GreedySolver() },
+        { KnapsackSolver() }
     )
 
     val inputFiles = listOf(
-        InputFile("inputs/a_example.in", "0"),
-        InputFile("inputs/b_narrow.in", "0"),
-        InputFile("inputs/c_urgent.in", "0"),
-        InputFile("inputs/d_typical.in", "0"),
-        InputFile("inputs/e_intriguing.in", "0"),
-        InputFile("inputs/f_big.in", "0")
+        InputFile(
+            "inputs/a_example.in",
+            "5742876508028928"
+        ),
+        InputFile(
+            "inputs/b_should_be_easy.in",
+            "5651204726063104"
+        ),
+        InputFile(
+            "inputs/c_no_hurry.in",
+            "5680006004998144"
+        ),
+        InputFile(
+            "inputs/d_metropolis.in",
+            "5654843402223616"
+        ),
+        InputFile(
+            "inputs/e_high_bonus.in",
+            "5649463653695488"
+        )
     )
 
     solvers.forEach {
