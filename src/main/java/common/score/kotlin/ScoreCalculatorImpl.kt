@@ -26,13 +26,14 @@ class ScoreCalculatorImpl : ScoreCalculator {
                 visitedRides.add(it.rideIndex)
 
                 val spentTimeMovingToStart = abs(carX - ride.start.x) + abs(carY - ride.start.y)
+
                 carTime += spentTimeMovingToStart
 
-                val startArrivalTime = carTime
-                if (startArrivalTime < ride.startTime) {
+                if (carTime < ride.startTime) {
                     // we need to wait for the start time
                     carTime = ride.startTime
                 }
+                val startArrivalTime = carTime
 
                 val spentTimeMovingToFinish = abs(ride.start.x - ride.end.x) + abs(ride.start.y - ride.end.y)
                 carTime += spentTimeMovingToFinish
