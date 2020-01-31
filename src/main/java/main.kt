@@ -16,19 +16,19 @@ fun main(args: Array<String>) {
             "5742876508028928"
         ),
         InputFile(
-            "inputs/b_small.in",
+            "inputs/b_should_be_easy.in",
             "5651204726063104"
         ),
         InputFile(
-            "inputs/c_medium.in",
+            "inputs/c_no_hurry.in",
             "5680006004998144"
         ),
         InputFile(
-            "inputs/d_quite_big.in",
+            "inputs/d_metropolis.in",
             "5654843402223616"
         ),
         InputFile(
-            "inputs/e_also_big.in",
+            "inputs/e_high_bonus.in",
             "5649463653695488"
         )
     )
