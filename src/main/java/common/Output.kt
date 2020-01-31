@@ -1,5 +1,10 @@
 package common
 
 data class Output(
-    val types: List<Int>
+    val handledRides: List<HandledRide>
+)
+
+data class HandledRide(
+    val rideIndex: Int,
+    val vehicleIndex: Int
 )
