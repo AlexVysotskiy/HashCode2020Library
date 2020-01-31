@@ -1,7 +1,7 @@
 package common
 
 import common.model.CompilationStep
-import common.score.kotlin.KotlinScoreCalculator
+import common.score.kotlin.ScoreCalculatorImpl
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.IsEqual
 import org.junit.Test
@@ -11,7 +11,7 @@ class ResultCalculatorTest {
 
     @Test
     fun example() {
-        val calculator = KotlinScoreCalculator()
+        val calculator = ScoreCalculatorImpl()
         val input = createInput()
         val output = createOutput()
 
