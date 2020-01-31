@@ -9,7 +9,7 @@ object Writer {
 
         val groupedRides = output.handledRides.groupBy { it.vehicleIndex }
         groupedRides.forEach {
-            writer.write(it.key)
+            writer.write(it.value.size)
             writer.write(" ")
             it.value.forEach {
                 writer.write(it.rideIndex)
