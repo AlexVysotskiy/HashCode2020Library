@@ -7,16 +7,16 @@ object Writer {
     fun write(output: Output, outputStream: OutputStream) {
         val writer = outputStream.bufferedWriter()
 
-        writer.write(output.types.size.toString())
-        writer.newLine()
-
-        output.types.forEach { type ->
-            writer.write(type.toString())
+        val groupedRides = output.handledRides.groupBy { it.vehicleIndex }
+        groupedRides.forEach {
+            writer.write(it.key)
             writer.write(" ")
+            it.value.forEach {
+                writer.write(it.rideIndex)
+                writer.write(" ")
+            }
+            writer.write("\n")
         }
-
-        writer.flush()
-        writer.close()
     }
 
 }
