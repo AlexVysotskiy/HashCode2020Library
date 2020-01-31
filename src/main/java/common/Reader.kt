@@ -14,19 +14,38 @@ object Reader {
         val bufferReader = BufferedReader(InputStreamReader(file))
         var stringTokenizer = StringTokenizer(bufferReader.readLine())
 
-        val max = parseLong(stringTokenizer.nextToken())
-        val typeCount = parseInt(stringTokenizer.nextToken())
+        val gridSize = Size(stringTokenizer.parseInt(), stringTokenizer.parseInt())
+        val carCount = stringTokenizer.parseInt()
+        val rideCount = stringTokenizer.parseInt()
+        val bonus = stringTokenizer.parseInt()
+        val timeLimit = stringTokenizer.parseInt()
 
-        stringTokenizer = StringTokenizer(bufferReader.readLine())
-        val types = ArrayList<Int>(typeCount)
-        for (i in 0 until typeCount) {
-            val slices = parseInt(stringTokenizer.nextToken())
-            types.add(slices)
+        val rides = mutableListOf<Ride>()
+        for (i in 0 until rideCount) {
+            stringTokenizer = StringTokenizer(bufferReader.readLine())
+
+            val start = Point(stringTokenizer.parseInt(), stringTokenizer.parseInt())
+            val finish = Point(stringTokenizer.parseInt(), stringTokenizer.parseInt())
+            val startTime = stringTokenizer.parseInt()
+            val finishTime = stringTokenizer.parseInt()
+            rides.add(
+                Ride(
+                    start = start,
+                    end = finish,
+                    startTime = startTime,
+                    endTime = finishTime
+                )
+            )
         }
 
         return Input(
-            max,
-            types
+            gridSize = gridSize,
+            vehicles = carCount,
+            rides = rides,
+            bonus = bonus,
+            timeLimit = timeLimit
         )
     }
 }
+
+private fun StringTokenizer.parseInt() = parseInt(nextToken())
