@@ -71,6 +71,8 @@ class SwarmOptimizer(
                         if (score > globalMaxValue) {
                             globalMaxValue = score
                             particle.position.copyInto(globalMax)
+
+                            println("New global maximum: $globalMaxValue")
                         }
                         latch.countDown()
                     }
