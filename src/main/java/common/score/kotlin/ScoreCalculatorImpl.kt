@@ -15,7 +15,7 @@ class ScoreCalculatorImpl : ScoreCalculator {
         val visitedRides = hashSetOf<Int>()
         var score = 0L
 
-        cars.forEach { (carIndex, rides) ->
+        cars.forEach { (_, rides) ->
             var carTime = 0
             var carX = 0
             var carY = 0
