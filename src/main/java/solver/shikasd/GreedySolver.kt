@@ -3,6 +3,7 @@ package solver.shikasd
 import common.*
 import common.helpers.SwarmOptimizer
 import common.score.kotlin.ScoreCalculatorImpl
+import common.score.kotlin.calculateScoreFast
 import kotlin.random.Random
 
 class GreedySolver(override val name: String = "shikasd.GreedySolver") : Solver {
@@ -41,10 +42,11 @@ class GreedySolver(override val name: String = "shikasd.GreedySolver") : Solver 
                 c0 = 0.5f,
                 c1 = 0.5f,
                 particleCount = 1000,
-                maxX = (input.vehicles + 1).toFloat() - 0.001f
+                maxX = (input.vehicles + 1).toFloat() - 0.001f,
+                maxIterationCount = 30
             )
         ) {
-            scoreCalculator.calculateResult(input, it)
+            calculateScoreFast(input, it).toLong()
         }
 
         return optimizer.solve().toOutput()

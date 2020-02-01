@@ -1,13 +1,17 @@
 package common
 
 import java.io.OutputStream
+import java.util.*
 
 object Writer {
 
     fun write(output: Output, outputStream: OutputStream) {
         val writer = outputStream.bufferedWriter()
 
-        val groupedRides = output.handledRides.groupBy { it.vehicleIndex }
+        val groupedRides = output
+            .handledRides
+            .groupByTo(TreeMap()) { it.vehicleIndex }
+
         groupedRides.forEach {
             writer.write(it.value.size.toString())
             writer.write(" ")
