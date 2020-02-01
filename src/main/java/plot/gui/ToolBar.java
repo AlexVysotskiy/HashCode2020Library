@@ -18,8 +18,6 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JToolBar;
 
-import plot.Utility.ImageLoader;
-
 public class ToolBar {
 
 	public JToolBar bar;

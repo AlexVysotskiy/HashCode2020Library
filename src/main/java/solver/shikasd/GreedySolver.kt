@@ -32,18 +32,16 @@ class GreedySolver(override val name: String = "shikasd.GreedySolver") : Solver 
 //            sortedRides.removeAll { it.second.endTime <= tick }
 //            tick++
 //        }
-//
-//
 
         val initialPositions = FloatArray(input.rides.size)
         val scoreCalculator = ScoreCalculatorImpl()
         val optimizer = SwarmOptimizer(
             initialPositions,
             params = SwarmOptimizer.Params(
-                c0 = 0.4f,
-                c1 = 0.6f,
-                particleCount = input.rides.size * 2,
-                maxX = (input.vehicles + 1).toFloat()
+                c0 = 0.5f,
+                c1 = 0.5f,
+                particleCount = 1000,
+                maxX = (input.vehicles + 1).toFloat() - 0.001f
             )
         ) {
             scoreCalculator.calculateResult(input, it)
@@ -52,10 +50,20 @@ class GreedySolver(override val name: String = "shikasd.GreedySolver") : Solver 
         return optimizer.solve().toOutput()
     }
 
-    private fun ScoreCalculator.calculateResult(input: Input, floatArray: FloatArray): Long =
+    fun Output.toFloatArray(input: Input): FloatArray {
+        val carFractions = FloatArray(input.vehicles) { it + 1.001f }
+        val initialPositions = FloatArray(input.rides.size)
+        handledRides.forEach {
+            initialPositions[it.rideIndex] = carFractions[it.vehicleIndex]
+            carFractions[it.vehicleIndex] += 0.001f
+        }
+        return initialPositions
+    }
+
+    fun ScoreCalculator.calculateResult(input: Input, floatArray: FloatArray): Long =
         calculateResult(input, floatArray.toOutput())
 
-    private fun FloatArray.toOutput(): Output {
+    fun FloatArray.toOutput(): Output {
         val result = zip(indices)
             .filter { it.first >= 1 }
             .sortedBy { it.first }
