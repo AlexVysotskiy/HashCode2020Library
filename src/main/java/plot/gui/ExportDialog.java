@@ -1,4 +1,4 @@
-package plot.GUI;
+package plot.gui;
 
 import java.awt.AWTException;
 import java.awt.Dimension;
@@ -18,49 +18,49 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.JDialog;
 
-import plot.GUI.ToolBar.ImageTransferable;
+import plot.gui.ToolBar.ImageTransferable;
 
 
 public class ExportDialog {
-	
+
 	private JDialog dialog;
 	private ColoredButton png, jpg, pdf;
-	
-	
+
+
 	public ExportDialog() {
-	
+
 		init();
 		addActions();
 	}
-	
+
 	public void init(){
-		
+
 		dialog = new JDialog();
 		dialog.setTitle("Export as");
 		dialog.setLayout(new GridLayout(3, 1));
 		dialog.setModal(true);
 		dialog.setSize(new Dimension(450, 500));
 		dialog.setLocationRelativeTo(MainFrame.frame);
-		
+
 		png = ColoredButton.GetRandomButton("PNG", "export the graph as a png image");
 		jpg = ColoredButton.GetRandomButton("JPEG", "export the graph as a jpeg image");
 		pdf = ColoredButton.GetRandomButton("PDF", "get the graph as a pdf file");
-		
+
 		dialog.add(png);
 		dialog.add(jpg);
 		dialog.add(pdf);
 	}
-	
+
 	public void addActions(){
-		
+
 		png.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
+
 				FileDialog fd = new FileDialog(MainFrame.frame, "Enter the name of the file", FileDialog.SAVE);
 				fd.setVisible(true);
-				
+
 				String filename;
 
 				try{
@@ -70,15 +70,15 @@ public class ExportDialog {
 				} catch(Exception ee){
 					return;
 				}
-				
+
 				dialog.dispose();
-				
+
 				if(!filename.contains(".")){
 					filename = filename + ".png";
 				}
-				
+
 				File file = new File(filename);
-				
+
 				 try {
 						BufferedImage image = null;
 						try {
@@ -87,28 +87,28 @@ public class ExportDialog {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						}
-						
+
 						Clipboard systemClipboard= Toolkit.getDefaultToolkit().getSystemClipboard();
 						systemClipboard.setContents(new ImageTransferable(image), null);
-						
-						
+
+
 						ImageIO.write(image, "png", file);
-						
+
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-			
+
 			}
 		});
-		
+
 		jpg.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				FileDialog fd = new FileDialog(MainFrame.frame, "Enter the name of the file", FileDialog.SAVE);
 				fd.setVisible(true);
-				
+
 				String filename;
 
 				try{
@@ -118,13 +118,13 @@ public class ExportDialog {
 				} catch(Exception ee){
 					return;
 				}
-				
+
 				if(!filename.contains(".")){
 					filename = filename + ".jpg";
 				}
 				dialog.dispose();
 				File file = new File(filename);
-				
+
 				 try {
 						BufferedImage image = null;
 						try {
@@ -133,10 +133,10 @@ public class ExportDialog {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						}
-						
+
 						Clipboard systemClipboard= Toolkit.getDefaultToolkit().getSystemClipboard();
 						systemClipboard.setContents(new ImageTransferable(image), null);
-						
+
 						ImageIO.write(image, "jpg", file);
 
 				} catch (IOException e1) {
@@ -145,10 +145,10 @@ public class ExportDialog {
 				}
 			}
 		});
-		
-		
+
+
 		pdf.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				FileDialog fd = new FileDialog(MainFrame.frame, "Enter the name of the file", FileDialog.SAVE);
@@ -156,9 +156,9 @@ public class ExportDialog {
 			}
 		});
 	}
-	
+
 	public void show(){
-		
+
 		dialog.setVisible(true);
 	}
 

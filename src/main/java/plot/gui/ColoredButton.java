@@ -1,4 +1,4 @@
-package plot.GUI;
+package plot.gui;
 
 
 import java.awt.Color;
@@ -81,7 +81,7 @@ public class ColoredButton extends CGlassButton {
 
       return buttonCancel;
    }
-   
+
    public static ColoredButton GetRandomButton(final String strName, final String strTooltip) {
 	      final ColoredButton buttonCancel = new ColoredButton();
 
@@ -91,7 +91,7 @@ public class ColoredButton extends CGlassButton {
 
 	      return buttonCancel;
 	   }
-   
+
    public static ColoredButton GetRandomButtonAd(String strName, String strTooltip){
 
 	   final ColoredButton buttonCancel = new ColoredButton();
@@ -122,6 +122,6 @@ public class ColoredButton extends CGlassButton {
       button.setCheckable(false);
       button.setFlat(false);
    }
-   
+
 
 }

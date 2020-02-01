@@ -1,4 +1,4 @@
-package plot.GUI;
+package plot.gui;
 
 import java.awt.AWTException;
 import java.awt.HeadlessException;
@@ -21,28 +21,28 @@ import javax.swing.JToolBar;
 import plot.Utility.ImageLoader;
 
 public class ToolBar {
-	
+
 	public JToolBar bar;
 	public JButton export, screenshot, help, exit;
-	
+
 	public ToolBar(){
-		
+
 		init();
 		addComponents();
 		addActions();
 	}
-	
+
 	public void init(){
-		
+
 		bar = new JToolBar();
 		export = new JButton("Export");
 		screenshot = new JButton("Take screenshot");
 		help = new JButton("Help");
 		exit = new JButton("Exit");
 	}
-	
+
 	public void addComponents(){
-		
+
 		bar.add(export);
 		bar.addSeparator();
 		bar.add(screenshot);
@@ -53,20 +53,20 @@ public class ToolBar {
 	}
 
 	public void addActions(){
-		
+
 		export.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				new ExportDialog().show();
 			}
 		});
-		
+
 		screenshot.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
+
 				BufferedImage image = null;
 				try {
 					image = new Robot().createScreenCapture(new Rectangle(Chart3D.getInstance().getPanel().getLocationOnScreen(), Chart3D.getInstance().getPanel().getSize()));
@@ -74,37 +74,37 @@ public class ToolBar {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-				
+
 				Clipboard systemClipboard= Toolkit.getDefaultToolkit().getSystemClipboard();
 				systemClipboard.setContents(new ImageTransferable(image), null);
-				
+
 				JOptionPane.showMessageDialog(MainFrame.frame, "Successfully copied the plot to the clipboard!");
-				
+
 			//	ImageIO.write(image, "png", new File("/screenshot.png"));
 			}
 		});
-		
+
 		help.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				JOptionPane.showMessageDialog(MainFrame.frame, "This is a demo application for 'Enhanced Graph plotting In Prism' GSOC 16 written by Muhammad Omer Saeed. Please see the tooltip of plot panel for controls.", "Help", JOptionPane.INFORMATION_MESSAGE);
 			}
 		});
-		
+
 		exit.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				System.exit(0);
 			}
 		});
 	}
-	
+
 	public JToolBar getBar(){
 		return bar;
 	}
-	
+
 	 static class ImageTransferable implements Transferable
 	    {
 	        private Image image;

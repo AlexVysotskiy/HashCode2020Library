@@ -1,4 +1,4 @@
-package plot.GUI
+package plot.gui
 
 import common.HandledRide
 import common.Input

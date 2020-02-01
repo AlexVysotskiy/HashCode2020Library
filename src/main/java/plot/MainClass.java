@@ -3,7 +3,7 @@ package plot;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-import plot.GUI.MainFrame;
+import plot.gui.MainFrame;
 
 public class MainClass {
 
@@ -20,8 +20,4 @@ public class MainClass {
 		MainFrame gui = new MainFrame();
 		gui.show();
 	}
-
-
-
-
 }
