@@ -83,9 +83,9 @@ class SwarmOptimizer(
     }
 
     private fun initParticle(): Particle {
-        val xSpread = params.maxX - params.minX
         val position = FloatArray(initialPosition.size) {
-            (initialPosition[it] + Random.nextFloat() * xSpread + params.minX).clipTo(params.minX, params.maxX)
+            val deviation = Random.nextFloat() * params.initialXSpread - params.initialXSpread / 2
+            (initialPosition[it] + deviation).clipTo(params.minX, params.maxX)
         }
         return Particle(
             localMax = position.copyOf(),
@@ -120,6 +120,7 @@ class SwarmOptimizer(
         val initialInertia: Float = 1f,
         val inertiaDecrement: Float = 1f,
 
-        val parallelism: Int = 8
+        val parallelism: Int = 8,
+        val initialXSpread: Float = 2f
     )
 }

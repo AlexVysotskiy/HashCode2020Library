@@ -4,6 +4,7 @@ import common.*
 import common.helpers.SwarmOptimizer
 import common.score.kotlin.ScoreCalculatorImpl
 import common.score.kotlin.calculateScoreFast
+import kotlin.math.max
 
 class GreedySolver(override val name: String = "shikasd.GreedySolver") : Solver {
 
@@ -19,15 +20,27 @@ class GreedySolver(override val name: String = "shikasd.GreedySolver") : Solver 
                 if (time > tick) return@forEachIndexed
                 val carPosition = carPositions[index]
 
-                val rides = sortedRides.asSequence().filter { (_, it) -> it.endTime >= it.distance() + carPosition.distanceTo(it.start) + tick }
-                val availableRide = rides.minBy { carPosition.distanceTo(it.second.start) } ?: return@forEachIndexed
+                val nextRide = sortedRides.maxBy { (index, ride) ->
+                    val canStartAt = tick + carPosition.distanceTo(ride.start)
+                    val canFinishAt = canStartAt + ride.distance()
 
-                sortedRides.remove(availableRide)
-                carTakenUntil[index] = tick + carPosition.distanceTo(availableRide.second.start) + availableRide.second.distance()
+                    if (canFinishAt > ride.endTime) return@maxBy 0.0
+
+                    val bonus = if (canStartAt <= ride.startTime) input.bonus else 0
+                    val actualStart = max(canStartAt, ride.startTime)
+                    val cost = ride.distance() + bonus
+                    val distanceToStart = carPosition.distanceTo(ride.start)
+                    val waitingTime = actualStart - canStartAt
+                    val score = cost - distanceToStart * 1.5 - waitingTime * 2.0
+                    score
+                } ?: return@forEachIndexed
+
+                sortedRides.remove(nextRide)
+                carTakenUntil[index] = max(tick + carPosition.distanceTo(nextRide.second.start), nextRide.second.startTime) + nextRide.second.distance()
                 handledRides.add(
-                    HandledRide(availableRide.first, index)
+                    HandledRide(nextRide.first, index)
                 )
-                carPositions[index] = availableRide.second.end
+                carPositions[index] = nextRide.second.end
             }
             sortedRides.removeAll { it.second.endTime <= tick }
             tick++
@@ -44,9 +57,10 @@ class GreedySolver(override val name: String = "shikasd.GreedySolver") : Solver 
                 c0 = 1.5f,
                 c1 = 2f,
                 initialInertia = 0.5f,
-                particleCount = 100,
+                particleCount = 10000,
                 maxX = (input.vehicles + 1).toFloat() - 0.001f,
-                maxIterationCount = 10000,
+                maxIterationCount = 1000,
+                initialXSpread = 4f,
                 parallelism = Runtime.getRuntime().availableProcessors()
             )
         ) {
@@ -73,7 +87,7 @@ class GreedySolver(override val name: String = "shikasd.GreedySolver") : Solver 
         val result = zip(indices)
             .filter { it.first >= 1 }
             .sortedBy { it.first }
-            .mapNotNull { (value, rideIndex) ->
+            .map { (value, rideIndex) ->
                 val carNumber = value.toInt() - 1
                 HandledRide(rideIndex, carNumber)
             }
