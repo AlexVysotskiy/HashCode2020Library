@@ -4,7 +4,6 @@ import common.*
 import common.helpers.SwarmOptimizer
 import common.score.kotlin.ScoreCalculatorImpl
 import common.score.kotlin.calculateScoreFast
-import kotlin.random.Random
 
 class GreedySolver(override val name: String = "shikasd.GreedySolver") : Solver {
 
@@ -42,9 +41,10 @@ class GreedySolver(override val name: String = "shikasd.GreedySolver") : Solver 
         val optimizer = SwarmOptimizer(
             greedySolution,
             params = SwarmOptimizer.Params(
-                c0 = 0.5f,
-                c1 = 0.5f,
-                particleCount = 1000,
+                c0 = 1.5f,
+                c1 = 2f,
+                initialInertia = 0.5f,
+                particleCount = 100,
                 maxX = (input.vehicles + 1).toFloat() - 0.001f,
                 maxIterationCount = 10000,
                 parallelism = Runtime.getRuntime().availableProcessors()
@@ -73,7 +73,7 @@ class GreedySolver(override val name: String = "shikasd.GreedySolver") : Solver 
         val result = zip(indices)
             .filter { it.first >= 1 }
             .sortedBy { it.first }
-            .map { (value, rideIndex) ->
+            .mapNotNull { (value, rideIndex) ->
                 val carNumber = value.toInt() - 1
                 HandledRide(rideIndex, carNumber)
             }
