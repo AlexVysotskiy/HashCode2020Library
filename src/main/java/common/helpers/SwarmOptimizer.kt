@@ -33,43 +33,66 @@ class SwarmOptimizer(
         var totalUpdate = 0L
         var totalCalculate = 0L
         val progressIterator = ProgressBar.wrap((0 until params.maxIterationCount).toList(), "").iterator() as ProgressBarWrappedIterator<Int>
-        progressIterator.progressBar.extraMessage = "Current max: $globalMaxValue"
+        progressIterator.progressBar.apply {
+            extraMessage = "Max: $globalMaxValue"
+        }
+
+        val chunkSize = particles.size / params.parallelism
         progressIterator.forEach {
             totalUpdate += measureTimeMillis {
-                val latch = CountDownLatch(particles.size)
-                particles.forEach { particle ->
-                    particle.velocity.forEachIndexed { index, velocity ->
-                        val r0 = Random.nextFloat()
-                        val r1 = Random.nextFloat()
-                        val self = params.c0 * r0 * (particle.localMax[index] - particle.position[index])
-                        val global = params.c1 * r1 * (globalMax[index] - particle.position[index])
+                val latch = CountDownLatch(params.parallelism)
+                (0 until params.parallelism).forEach {
+                    executor.submit {
+                        val start = it * chunkSize
+                        val end = ((it + 1) * chunkSize)
+                        (start until end).forEach { i ->
+                            val particle = particles[i]
+                            particle.velocity.forEachIndexed { index, velocity ->
+                                val r0 = Random.nextFloat()
+                                val r1 = Random.nextFloat()
+                                val self = params.c0 * r0 * (particle.localMax[index] - particle.position[index])
+                                val global = params.c1 * r1 * (globalMax[index] - particle.position[index])
 
-                        particle.velocity[index] = inertia * velocity + self + global
-                        particle.velocity[index] =
-                            particle.velocity[index].clipTo(-params.maxVelocity, params.maxVelocity)
-                    }
+                                particle.velocity[index] = inertia * velocity + self + global
+                                particle.velocity[index] =
+                                    particle.velocity[index].clipTo(-params.maxVelocity, params.maxVelocity)
+                            }
 
-                    particle.position.forEachIndexed { index, _ ->
-                        particle.position[index] += particle.velocity[index]
-                        particle.position[index] = particle.position[index].clipTo(params.minX, params.maxX)
+                            particle.position.forEachIndexed { index, _ ->
+                                particle.position[index] += particle.velocity[index]
+                                particle.position[index] = particle.position[index].clipTo(params.minX, params.maxX)
+                            }
+                        }
+                        latch.countDown()
                     }
                 }
+                latch.await()
             }
 
             totalCalculate += measureTimeMillis {
-                particles.forEach { particle ->
-                    val score = calculateScore(particle.position)
-                    if (score > particle.localMaxValue) {
-                        particle.localMaxValue = score
-                        particle.position.copyInto(particle.localMax)
-                    }
+                val latch = CountDownLatch(params.parallelism)
+                (0 until params.parallelism).forEach {
+                    executor.submit {
+                        val start = it * chunkSize
+                        val end = ((it + 1) * chunkSize)
+                        (start until end).forEach { i ->
+                            val particle = particles[i]
+                            val score = calculateScore(particle.position)
+                            if (score > particle.localMaxValue) {
+                                particle.localMaxValue = score
+                                particle.position.copyInto(particle.localMax)
+                            }
 
-                    if (score > globalMaxValue) {
-                        globalMaxValue = score
-                        particle.position.copyInto(globalMax)
-                        progressIterator.progressBar.extraMessage = ("Current max: $globalMaxValue")
+                            if (score > globalMaxValue) {
+                                globalMaxValue = score
+                                particle.position.copyInto(globalMax)
+                                progressIterator.progressBar.extraMessage = ("Max: $globalMaxValue")
+                            }
+                        }
+                        latch.countDown()
                     }
                 }
+                latch.await()
             }
 
             inertia *= params.inertiaDecrement

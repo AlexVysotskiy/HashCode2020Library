@@ -3,16 +3,39 @@ package solver.shikasd
 import common.*
 import common.helpers.SwarmOptimizer
 import common.score.kotlin.ScoreCalculatorImpl
-import common.score.kotlin.calculateScoreFast
 import kotlin.math.max
 
 class GreedySolver(override val name: String = "shikasd.GreedySolver") : Solver {
 
     override fun solve(input: Input): Output {
+        val scoreCalculator = ScoreCalculatorImpl()
+
+        val optimizer = SwarmOptimizer(
+            initialPosition = FloatArray(3) { 1f },
+            params = SwarmOptimizer.Params(
+                c0 = 2f,
+                c1 = 2f,
+                initialInertia = 0.5f,
+                particleCount = 20,
+                maxX = 10f,
+                minX = 0.1f,
+                maxIterationCount = 100,
+                initialXSpread = 2f,
+                parallelism = Runtime.getRuntime().availableProcessors()
+            )
+        ) {
+            val output = doGreedy(input, it)
+            scoreCalculator.calculateResult(input, output)
+        }
+
+        return optimizer.solve().toOutput()
+    }
+
+    fun doGreedy(input: Input, params: FloatArray): Output {
         var tick = 0
         val carTakenUntil = IntArray(input.vehicles)
         val carPositions = Array(input.vehicles) { Point(0, 0) }
-        val sortedRides = input.rides.mapIndexed { index, ride -> index to ride  }.toMutableList()
+        val sortedRides = input.rides.mapIndexed { index, ride -> index to ride }.toMutableList()
 
         val handledRides = mutableListOf<HandledRide>()
         while (tick < input.timeLimit) {
@@ -24,14 +47,14 @@ class GreedySolver(override val name: String = "shikasd.GreedySolver") : Solver 
                     val canStartAt = tick + carPosition.distanceTo(ride.start)
                     val canFinishAt = canStartAt + ride.distance()
 
-                    if (canFinishAt > ride.endTime) return@maxBy 0.0
+                    if (canFinishAt > ride.endTime) return@maxBy 0f
 
                     val bonus = if (canStartAt <= ride.startTime) input.bonus else 0
                     val actualStart = max(canStartAt, ride.startTime)
                     val cost = ride.distance() + bonus
                     val distanceToStart = carPosition.distanceTo(ride.start)
                     val waitingTime = actualStart - canStartAt
-                    val score = cost - distanceToStart * 1.5 - waitingTime * 2.0
+                    val score = cost * params[0] - distanceToStart * params[1] - waitingTime * params[2]
                     score
                 } ?: return@forEachIndexed
 
@@ -45,29 +68,7 @@ class GreedySolver(override val name: String = "shikasd.GreedySolver") : Solver 
             sortedRides.removeAll { it.second.endTime <= tick }
             tick++
         }
-
-        val scoreCalculator = ScoreCalculatorImpl()
-        val greedyScore = scoreCalculator.calculateResult(input, Output(handledRides))
-        println("Greedy score: $greedyScore")
-        val greedySolution = Output(handledRides).toFloatArray(input)
-
-        val optimizer = SwarmOptimizer(
-            greedySolution,
-            params = SwarmOptimizer.Params(
-                c0 = 1.5f,
-                c1 = 2f,
-                initialInertia = 0.5f,
-                particleCount = 10000,
-                maxX = (input.vehicles + 1).toFloat() - 0.001f,
-                maxIterationCount = 1000,
-                initialXSpread = 4f,
-                parallelism = Runtime.getRuntime().availableProcessors()
-            )
-        ) {
-            calculateScoreFast(input, it).toLong()
-        }
-
-        return optimizer.solve().toOutput()
+        return Output(handledRides)
     }
 
     fun Output.toFloatArray(input: Input): FloatArray {
