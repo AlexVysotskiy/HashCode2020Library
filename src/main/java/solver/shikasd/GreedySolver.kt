@@ -4,9 +4,12 @@ import common.*
 import common.helpers.SwarmOptimizer
 import common.score.kotlin.ScoreCalculatorImpl
 import kotlin.math.max
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTimedValue
 
 class GreedySolver(override val name: String = "shikasd.GreedySolver") : Solver {
 
+    @ExperimentalTime
     override fun solve(input: Input): Output {
         val scoreCalculator = ScoreCalculatorImpl()
 
@@ -24,8 +27,14 @@ class GreedySolver(override val name: String = "shikasd.GreedySolver") : Solver 
                 parallelism = Runtime.getRuntime().availableProcessors()
             )
         ) {
-            val output = doGreedy(input, it)
-            scoreCalculator.calculateResult(input, output)
+            val time = measureTimedValue {
+                val output = doGreedy(input, it)
+                scoreCalculator.calculateResult(input, output)
+            }
+
+            println(time.duration.inMilliseconds)
+
+            time.value
         }
 
         return optimizer.solve().toOutput()
@@ -65,7 +74,6 @@ class GreedySolver(override val name: String = "shikasd.GreedySolver") : Solver 
                 )
                 carPositions[index] = nextRide.second.end
             }
-            sortedRides.removeAll { it.second.endTime <= tick }
             tick++
         }
         return Output(handledRides)
