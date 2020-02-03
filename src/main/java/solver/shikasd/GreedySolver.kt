@@ -32,7 +32,7 @@ class GreedySolver(override val name: String = "shikasd.GreedySolver") : Solver 
                 scoreCalculator.calculateResult(input, output)
             }
 
-            println(time.duration.inMilliseconds)
+//            println(time.duration.inMilliseconds)
 
             time.value
         }
