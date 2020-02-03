@@ -44,7 +44,7 @@ class ScoreCalculatorImpl : ScoreCalculator {
 
                 // arrived on time, woohoo
                 if (finishArrivalTime <= ride.endTime) {
-                    score += ride.distance()
+                    score += ride.distance
 
                     if (startArrivalTime == ride.startTime) {
                         // bonus point because we start precisely on time

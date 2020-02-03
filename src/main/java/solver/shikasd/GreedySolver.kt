@@ -54,13 +54,13 @@ class GreedySolver(override val name: String = "shikasd.GreedySolver") : Solver 
 
                 val nextRide = sortedRides.maxBy { (index, ride) ->
                     val canStartAt = tick + carPosition.distanceTo(ride.start)
-                    val canFinishAt = canStartAt + ride.distance()
+                    val canFinishAt = canStartAt + ride.distance
 
                     if (canFinishAt > ride.endTime) return@maxBy 0f
 
                     val bonus = if (canStartAt <= ride.startTime) input.bonus else 0
                     val actualStart = max(canStartAt, ride.startTime)
-                    val cost = ride.distance() + bonus
+                    val cost = ride.distance + bonus
                     val distanceToStart = carPosition.distanceTo(ride.start)
                     val waitingTime = actualStart - canStartAt
                     val score = cost * params[0] - distanceToStart * params[1] - waitingTime * params[2]
@@ -68,7 +68,7 @@ class GreedySolver(override val name: String = "shikasd.GreedySolver") : Solver 
                 } ?: return@forEachIndexed
 
                 sortedRides.remove(nextRide)
-                carTakenUntil[index] = max(tick + carPosition.distanceTo(nextRide.second.start), nextRide.second.startTime) + nextRide.second.distance()
+                carTakenUntil[index] = max(tick + carPosition.distanceTo(nextRide.second.start), nextRide.second.startTime) + nextRide.second.distance
                 handledRides.add(
                     HandledRide(nextRide.first, index)
                 )

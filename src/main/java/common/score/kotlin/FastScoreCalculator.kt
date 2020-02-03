@@ -45,7 +45,7 @@ fun calculateScoreFast(input: Input, array: FloatArray): Int {
 
         // arrived on time, woohoo
         if (finishArrivalTime <= ride.endTime) {
-            totalScore += ride.distance()
+            totalScore += ride.distance
 
             if (startArrivalTime == ride.startTime) {
                 // bonus point because we start precisely on time

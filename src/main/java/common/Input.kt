@@ -16,7 +16,7 @@ data class Ride(
     val startTime: Int,
     val endTime: Int
 ) {
-    fun distance(): Int = abs(start.x - end.x) + abs(start.y - end.y)
+    val distance: Int = abs(start.x - end.x) + abs(start.y - end.y)
 }
 
 data class Point(
