@@ -3,6 +3,7 @@ package solver.shikasd
 import common.*
 import common.helpers.SwarmOptimizer
 import common.score.kotlin.ScoreCalculatorImpl
+import common.score.kotlin.calculateScoreFast
 import kotlin.math.max
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
@@ -19,10 +20,10 @@ class GreedySolver(override val name: String = "shikasd.GreedySolver") : Solver 
                 c0 = 2f,
                 c1 = 2f,
                 initialInertia = 0.5f,
-                particleCount = 20,
+                particleCount = 16,
                 maxX = 10f,
                 minX = 0.1f,
-                maxIterationCount = 100,
+                maxIterationCount = 300,
                 initialXSpread = 2f,
                 parallelism = Runtime.getRuntime().availableProcessors()
             )
@@ -67,12 +68,13 @@ class GreedySolver(override val name: String = "shikasd.GreedySolver") : Solver 
                     score
                 } ?: return@forEachIndexed
 
+                val (rideIndex, ride) = nextRide
                 sortedRides.remove(nextRide)
-                carTakenUntil[index] = max(tick + carPosition.distanceTo(nextRide.second.start), nextRide.second.startTime) + nextRide.second.distance
+                carTakenUntil[index] = max(tick + carPosition.distanceTo(ride.start), nextRide.second.startTime) + ride.distance
                 handledRides.add(
-                    HandledRide(nextRide.first, index)
+                    HandledRide(rideIndex, index)
                 )
-                carPositions[index] = nextRide.second.end
+                carPositions[index] = ride.end
             }
             tick++
         }
