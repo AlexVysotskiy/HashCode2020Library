@@ -43,7 +43,7 @@ class ScoreCalculatorImpl : ScoreCalculator {
                 carY = ride.end.y
 
                 // arrived on time, woohoo
-                if (finishArrivalTime <= ride.endTime) {
+                if (finishArrivalTime <= input.timeLimit && finishArrivalTime <= ride.endTime) {
                     score += ride.distance
 
                     if (startArrivalTime == ride.startTime) {
