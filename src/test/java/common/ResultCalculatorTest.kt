@@ -1,7 +1,7 @@
 package common
 
-import common.model.CompilationStep
-import common.score.kotlin.KotlinScoreCalculator
+import common.score.kotlin.ScoreCalculatorImpl
+import common.score.kotlin.calculateScoreFast
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.IsEqual
 import org.junit.Test
@@ -11,13 +11,33 @@ class ResultCalculatorTest {
 
     @Test
     fun example() {
-        val calculator = KotlinScoreCalculator()
+        val calculator = ScoreCalculatorImpl()
         val input = createInput()
         val output = createOutput()
 
         val result = calculator.calculateResult(input, output)
 
-        assertThat(result, IsEqual(60L))
+        assertThat(result, IsEqual(10L))
+    }
+
+    @Test
+    fun exampleFast() {
+        val input = createInput()
+        val output = createOutput()
+
+        val result = calculateScoreFast(input, output.toFloatArray(input))
+
+        assertThat(result, IsEqual(10))
+    }
+
+    private fun Output.toFloatArray(input: Input): FloatArray {
+        val carFractions = FloatArray(input.vehicles) { it + 1.001f }
+        val initialPositions = FloatArray(input.rides.size)
+        handledRides.forEach {
+            initialPositions[it.rideIndex] = carFractions[it.vehicleIndex]
+            carFractions[it.vehicleIndex] += 0.001f
+        }
+        return initialPositions
     }
 
     private fun createInput(): Input =
@@ -30,13 +50,9 @@ class ResultCalculatorTest {
     private fun createOutput(): Output {
         return Output(
             listOf(
-                CompilationStep("c1", 1),
-                CompilationStep("c0", 0),
-                CompilationStep("c3", 1),
-                CompilationStep("c2", 0),
-                CompilationStep("c2", 1),
-                CompilationStep("c4", 0),
-                CompilationStep("c5", 1)
+                HandledRide(0, 0),
+                HandledRide(2, 1),
+                HandledRide(1, 1)
             )
         )
     }

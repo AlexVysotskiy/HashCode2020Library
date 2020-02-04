@@ -1,5 +1,5 @@
 import common.*
-import common.score.kotlin.KotlinScoreCalculator
+import common.score.kotlin.ScoreCalculatorImpl
 import uploader.Uploader
 import java.io.File
 
@@ -9,7 +9,7 @@ fun executeSolver(inputs: List<InputFile>, solverFactory: () -> Solver) {
 
     println("Checking solution [$name]")
 
-    val resultCalculator = KotlinScoreCalculator()
+    val resultCalculator = ScoreCalculatorImpl()
 
     val results = mutableListOf<Pair<InputFile, Output>>()
 
