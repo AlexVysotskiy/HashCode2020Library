@@ -28,9 +28,9 @@ __kernel void solverKernel(
    for (int i = 0; i < vehicles; i++) carPositionsY[i] = 0;
 
    __private int handledRidesPosition = 0;
-   __private int handledRidesResult[$vehicle_count$ * 2];
+   __private int handledRidesResult[$rides_count$ * 2];
 
-   __private int removedRides[$vehicle_count$];
+   __private int removedRides[$rides_count$];
    for (int i = 0; i < ridesCount; i++) removedRides[i] = 0;
 
    while (tick < timeLimit) {
