@@ -3,7 +3,6 @@ package solver.shikasd
 import common.*
 import common.helpers.SwarmOptimizer
 import common.score.kotlin.ScoreCalculatorImpl
-import common.score.kotlin.calculateScoreFast
 import kotlin.math.max
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
@@ -15,7 +14,7 @@ class GreedySolver(override val name: String = "shikasd.GreedySolver") : Solver 
         val scoreCalculator = ScoreCalculatorImpl()
 
         val optimizer = SwarmOptimizer(
-            initialPosition = FloatArray(3) { 1f },
+            initialPosition = FloatArray(5) { 1f },
             params = SwarmOptimizer.Params(
                 c0 = 2f,
                 c1 = 2f,
@@ -38,45 +37,74 @@ class GreedySolver(override val name: String = "shikasd.GreedySolver") : Solver 
             time.value
         }
 
-        return optimizer.solve().toOutput()
+        return doGreedy(input, optimizer.solve())
     }
 
     fun doGreedy(input: Input, params: FloatArray): Output {
         var tick = 0
         val carTakenUntil = IntArray(input.vehicles)
         val carPositions = Array(input.vehicles) { Point(0, 0) }
-        val sortedRides = input.rides.mapIndexed { index, ride -> index to ride }.toMutableList()
+        val rideTaken = BooleanArray(input.rides.size)
 
         val handledRides = mutableListOf<HandledRide>()
         while (tick < input.timeLimit) {
-            carTakenUntil.forEachIndexed { index, time ->
-                if (time > tick) return@forEachIndexed
-                val carPosition = carPositions[index]
+            carTakenUntil.indices.forEach { carIndex ->
+                val time = carTakenUntil[carIndex]
+                if (time > tick) return@forEach
+                val carPosition = carPositions[carIndex]
 
-                val nextRide = sortedRides.maxBy { (index, ride) ->
+                var maxIndex = -1
+                var firstValue = true
+                var maxValue = 0f
+                input.rides.forEachIndexed { index, ride ->
+                    if (rideTaken[index]) return@forEachIndexed
+
                     val canStartAt = tick + carPosition.distanceTo(ride.start)
-                    val canFinishAt = canStartAt + ride.distance
-
-                    if (canFinishAt > ride.endTime) return@maxBy 0f
-
-                    val bonus = if (canStartAt <= ride.startTime) input.bonus else 0
                     val actualStart = max(canStartAt, ride.startTime)
-                    val cost = ride.distance + bonus
-                    val distanceToStart = carPosition.distanceTo(ride.start)
-                    val waitingTime = actualStart - canStartAt
-                    val score = cost * params[0] - distanceToStart * params[1] - waitingTime * params[2]
-                    score
-                } ?: return@forEachIndexed
+                    val canFinishAt = actualStart + ride.distance
 
-                val (rideIndex, ride) = nextRide
-                sortedRides.remove(nextRide)
-                carTakenUntil[index] = max(tick + carPosition.distanceTo(ride.start), nextRide.second.startTime) + ride.distance
+                    var score = 0f
+                    if (canFinishAt <= ride.endTime) {
+                        val distance =
+                            if ((ride.end.x > 5000 || ride.end.y > 5000) && tick < input.timeLimit * params[4]) {
+                                1000
+                            } else {
+                                0
+                            }
+
+                        val bonus = if (canStartAt <= ride.startTime) input.bonus else 0
+
+                        val cost = ride.distance + bonus
+                        val distanceToStart = carPosition.distanceTo(ride.start)
+                        val waitingTime = actualStart - canStartAt
+                        score = cost * params[0] - distanceToStart * params[1] - waitingTime * params[2] - distance * params[3]
+                    }
+
+                    if (firstValue || score > maxValue) {
+                        maxValue = score
+                        maxIndex = index
+                        firstValue = false
+                    }
+                }
+
+                if (maxIndex == -1) {
+                    return@forEach
+                }
+
+                val ride = input.rides[maxIndex]
+                rideTaken[maxIndex] = true
+                carTakenUntil[carIndex] = max(tick + carPosition.distanceTo(ride.start), ride.startTime) + ride.distance
                 handledRides.add(
-                    HandledRide(rideIndex, index)
+                    HandledRide(maxIndex, carIndex)
                 )
-                carPositions[index] = ride.end
+                carPositions[carIndex] = ride.end
             }
-            tick++
+            val nextTick = carTakenUntil.min() ?: tick + 1
+            if (nextTick <= tick) {
+                tick ++
+            } else {
+                tick = nextTick
+            }
         }
         return Output(handledRides)
     }
