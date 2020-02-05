@@ -21,33 +21,84 @@ __kernel void solverKernel(
    __private int carTakenUntil[vehicles];
    for (int i = 0; i < vehicles; i++) carTakenUntil[i] = 0;
 
-   __private int carPositionX[vehicles];
-   for (int i = 0; i < vehicles; i++) carPositionX[i] = 0;
+   __private int carPositionsX[vehicles];
+   for (int i = 0; i < vehicles; i++) carPositionsX[i] = 0;
 
-   __private int carPositionY[vehicles];
-   for (int i = 0; i < vehicles; i++) carPositionY[i] = 0;
+   __private int carPositionsY[vehicles];
+   for (int i = 0; i < vehicles; i++) carPositionsY[i] = 0;
 
    __private int handledRidesPosition = 0;
+   __private int handledRidesResult[ridesCount * 2];
 
-   __private int handledRidesResult[ridesCount];
-   for (int i = 0; i < vehicles; i++) carPositionY[i] = 0;
-
-   __private int visitedRides[ridesCount];
+   __private int removedRides[ridesCount];
+   for (int i = 0; i < ridesCount; i++) removedRides[i] = 0;
 
    while (tick < timeLimit) {
+        for (int index = 0; index < vehicles; index++) {
+            int time = carTakenUntil[index];
+            if (time > tick) break;
 
+            int carPositionX = carPositionsX[index];
+            int carPositionY = carPositionsY[index];
+
+            int maxScore = 0;
+            int maxRideIndex = -1;
+
+            for (int i = 0; i < ridesCount; i++) {
+               if (removedRides[i] == 1) continue;
+
+               int startX = rides[i * 6];
+               int startY = rides[i * 6 + 1];
+               int finishX = rides[i * 6 + 2];
+               int finishY = rides[i * 6 + 3];
+               int startTime = rides[i * 6 + 4];
+               int endTime = rides[i * 6 + 5];
+
+               int rideDistance = abs(startX - finishX) + abs(startY - finishY);
+
+               int distanceFromCarToRideStart = abs(carPositionX - startX) + abs(carPositionY - startY);
+               int canStartAt = tick + distanceFromCarToRideStart;
+
+               float score = 0;
+               if (canFinishAt <= endTime) {
+                    int rideBonus = 0;
+                    if (canStartAt <= startTime) rideBonus = bonus;
+                    int actualStart = max(canStartAt, startTime);
+                    int cost = rideDistance + bonus;
+                    int waitingTime = actualStart - canStartAt;
+                    score = (float) cost * a - (float) distanceFromCarToRideStart * b - (float) waitingTime * c;
+               }
+
+               if (maxRideIndex == -1 || score > maxScore) {
+                    maxScore = score;
+                    maxRideIndex = i;
+               }
+            }
+
+            if (maxRideIndex == -1) {
+                // no rides left
+                break;
+            }
+
+            int startX = rides[maxRideIndex * 6];
+            int startY = rides[maxRideIndex * 6 + 1];
+            int finishX = rides[maxRideIndex * 6 + 2];
+            int finishY = rides[maxRideIndex * 6 + 3];
+            int startTime = rides[maxRideIndex * 6 + 4];
+            int rideDistance = abs(startX - finishX) + abs(startY - finishY);
+            int distanceFromCarToRideStart = abs(carPositionX - startX) + abs(carPositionY - startY);
+
+            removedRides[maxRideIndex] = 1;
+            carTakenUntil[index] = max(tick + distanceFromCarToRideStart, startTime) + rideDistance;
+            carPositionsX[index] = finishX;
+            carPositionsY[index] = finishY;
+
+            handledRidesResult[handledRidesPosition * 2] = maxRideIndex;
+            handledRidesResult[handledRidesPosition * 2 + 1] = index;
+            handledRidesPosition++;
+        }
         tick++;
    }
-
-   int rideIndex = 0;
-   int startX = rides[rideIndex * 6];
-   int startY = rides[rideIndex * 6 + 1];
-   int finishX = rides[rideIndex * 6 + 2];
-   int finishY = rides[rideIndex * 6 + 3];
-   int startTime = rides[rideIndex * 6 + 4];
-   int endTime = rides[rideIndex * 6 + 5];
-
-
 
    /**
             var tick = 0
