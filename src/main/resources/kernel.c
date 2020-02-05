@@ -18,19 +18,19 @@ __kernel void solverKernel(
    float c = greedyParams[gid * 3 + 2];
 
    int tick = 0;
-   __private int carTakenUntil[vehicles];
+   __private int carTakenUntil[$vehicle_count$];
    for (int i = 0; i < vehicles; i++) carTakenUntil[i] = 0;
 
-   __private int carPositionsX[vehicles];
+   __private int carPositionsX[$vehicle_count$];
    for (int i = 0; i < vehicles; i++) carPositionsX[i] = 0;
 
-   __private int carPositionsY[vehicles];
+   __private int carPositionsY[$vehicle_count$];
    for (int i = 0; i < vehicles; i++) carPositionsY[i] = 0;
 
    __private int handledRidesPosition = 0;
-   __private int handledRidesResult[ridesCount * 2];
+   __private int handledRidesResult[$vehicle_count$ * 2];
 
-   __private int removedRides[ridesCount];
+   __private int removedRides[$vehicle_count$];
    for (int i = 0; i < ridesCount; i++) removedRides[i] = 0;
 
    while (tick < timeLimit) {

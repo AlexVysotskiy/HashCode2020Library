@@ -108,9 +108,11 @@ public class GpuSolver {
         srcMemCommonParams = clCreateBuffer(context,
                 CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
                 Sizeof.cl_int * srcArrayCommonParams.length, srcArrayCommonParamsPointer, null);
+
         srcMemRides = clCreateBuffer(context,
                 CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
                 Sizeof.cl_int * srcArrayRides.length, srcArrayRidesPointer, null);
+
         srcMemGreedyParams = clCreateBuffer(context,
                 CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
                 Sizeof.cl_float * srcArrayGreedyParams.length, srcArrayGreedyParamsPointer, null);
@@ -119,9 +121,13 @@ public class GpuSolver {
                 CL_MEM_READ_WRITE,
                 Sizeof.cl_int * workItems, null, null);
 
+        final String sourceCode = GpuSolverKernel.source
+                .replace("$vehicle_count$", String.valueOf(input.getVehicles()))
+                .replace("$rides_count$", String.valueOf(input.getRides().size()));
+
         // Create the program from the source code
         program = clCreateProgramWithSource(context,
-                1, new String[]{GpuSolverKernel.source}, null, null);
+                1, new String[]{sourceCode}, null, null);
 
         // Build the program
         clBuildProgram(program, 0, null, null, null, null);
