@@ -36,7 +36,7 @@ __kernel void solverKernel(
    while (tick < timeLimit) {
         for (int index = 0; index < vehicles; index++) {
             int time = carTakenUntil[index];
-            if (time > tick) break;
+            if (time > tick) continue;
 
             int carPositionX = carPositionsX[index];
             int carPositionY = carPositionsY[index];
