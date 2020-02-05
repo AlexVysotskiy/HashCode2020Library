@@ -101,5 +101,51 @@ __kernel void solverKernel(
         tick++;
    }
 
-   resultScores[gid] = 123;
+   for (int i = 0; i < vehicles; i++) carPositionsX[i] = 0;
+   for (int i = 0; i < vehicles; i++) carPositionsY[i] = 0;
+   for (int i = 0; i < vehicles; i++) carTakenUntil[i] = 0; // car time
+
+   int totalScore = 0;
+   for (int i = 0; i < handledRidesPosition; i++) {
+        int rideIndex = handledRidesResult[i * 2];
+        int carIndex = handledRidesResult[i * 2 + 1];
+
+        int carPositionX = carPositionsX[carIndex];
+        int carPositionY = carPositionsY[carIndex];
+
+        int startX = rides[rideIndex * 6];
+        int startY = rides[rideIndex * 6 + 1];
+        int finishX = rides[rideIndex * 6 + 2];
+        int finishY = rides[rideIndex * 6 + 3];
+        int startTime = rides[rideIndex * 6 + 4];
+        int endTime = rides[rideIndex * 6 + 5];
+        int rideDistance = abs(startX - finishX) + abs(startY - finishY);
+
+        int spentTimeMovingToStart = abs(carPositionX - startX) + abs(carPositionY - startY);
+        carTakenUntil[carIndex] += spentTimeMovingToStart;
+
+        if (carTakenUntil[carIndex] < startTime) {
+            // we need to wait for the start time
+            carTakenUntil[carIndex] = startTime;
+        }
+
+        int startArrivalTime = carTakenUntil[carIndex];
+        int spentTimeMovingToFinish = rideDistance;
+        carTakenUntil[carIndex] += spentTimeMovingToFinish;
+        int finishArrivalTime = carTakenUntil[carIndex];
+
+        carPositionsX[carIndex] = finishX;
+        carPositionsY[carIndex] = finishY;
+
+        if (finishArrivalTime <= endTime) {
+            // arrived on time, woo hoo
+            totalScore += rideDistance;
+
+            if (startArrivalTime == startTime) {
+                totalScore += bonus;
+            }
+        }
+   }
+
+   resultScores[gid] = totalScore;
 }

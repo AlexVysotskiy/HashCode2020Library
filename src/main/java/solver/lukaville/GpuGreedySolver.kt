@@ -1,8 +1,7 @@
 package solver.lukaville
 
-import common.Input
-import common.Output
-import common.Solver
+import common.*
+import kotlin.math.max
 
 class GpuGreedySolver(override val name: String = "lukaville.GreedySolver") : Solver {
 
@@ -16,7 +15,7 @@ class GpuGreedySolver(override val name: String = "lukaville.GreedySolver") : So
         solver.initialize(input, workItems, greedyParamsCount, scoresOutput)
 
         val params = Array(workItems) {
-            FloatArray(3) { 1.5f }
+            FloatArray(3) { 1f }
         }
 
         solver.solve(params, scoresOutput)
@@ -27,7 +26,46 @@ class GpuGreedySolver(override val name: String = "lukaville.GreedySolver") : So
 
         solver.terminate()
 
-        return Output(emptyList())
+        return doGreedy(input, FloatArray(3) { 1f })
     }
 
+    private fun doGreedy(input: Input, params: FloatArray): Output {
+        var tick = 0
+        val carTakenUntil = IntArray(input.vehicles)
+        val carPositions = Array(input.vehicles) { Point(0, 0) }
+        val sortedRides = input.rides.mapIndexed { index, ride -> index to ride }.toMutableList()
+
+        val handledRides = mutableListOf<HandledRide>()
+        while (tick < input.timeLimit) {
+            carTakenUntil.forEachIndexed { index, time ->
+                if (time > tick) return@forEachIndexed
+                val carPosition = carPositions[index]
+
+                val nextRide = sortedRides.maxBy { (index, ride) ->
+                    val canStartAt = tick + carPosition.distanceTo(ride.start)
+                    val canFinishAt = canStartAt + ride.distance
+
+                    if (canFinishAt > ride.endTime) return@maxBy 0f
+
+                    val bonus = if (canStartAt <= ride.startTime) input.bonus else 0
+                    val actualStart = max(canStartAt, ride.startTime)
+                    val cost = ride.distance + bonus
+                    val distanceToStart = carPosition.distanceTo(ride.start)
+                    val waitingTime = actualStart - canStartAt
+                    val score = cost * params[0] - distanceToStart * params[1] - waitingTime * params[2]
+                    score
+                } ?: return@forEachIndexed
+
+                val (rideIndex, ride) = nextRide
+                sortedRides.remove(nextRide)
+                carTakenUntil[index] = max(tick + carPosition.distanceTo(ride.start), nextRide.second.startTime) + ride.distance
+                handledRides.add(
+                    HandledRide(rideIndex, index)
+                )
+                carPositions[index] = ride.end
+            }
+            tick++
+        }
+        return Output(handledRides)
+    }
 }
