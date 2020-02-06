@@ -13,6 +13,15 @@ class GreedySolver(override val name: String = "shikasd.GreedySolver") : Solver 
     override fun solve(input: Input): Output {
         val scoreCalculator = ScoreCalculatorImpl()
 
+        val ridesToClosest = HashMap<Ride, Int>()
+        input.rides.forEach { initial ->
+            val closestRide = input.rides.minBy {
+                if (it == initial) Int.MAX_VALUE
+                initial.end.distanceTo(it.start)
+            }
+            ridesToClosest[initial] = initial.end.distanceTo(closestRide!!.start)
+        }
+
         val optimizer = SwarmOptimizer(
             initialPosition = FloatArray(5) { 1f },
             params = SwarmOptimizer.Params(
@@ -28,7 +37,7 @@ class GreedySolver(override val name: String = "shikasd.GreedySolver") : Solver 
             )
         ) {
             val time = measureTimedValue {
-                val output = doGreedy(input, it)
+                val output = doGreedy(input, ridesToClosest,  it)
                 scoreCalculator.calculateResult(input, output)
             }
 
@@ -37,10 +46,10 @@ class GreedySolver(override val name: String = "shikasd.GreedySolver") : Solver 
             time.value
         }
 
-        return doGreedy(input, optimizer.solve())
+        return doGreedy(input, ridesToClosest, FloatArray(5) { 1f })
     }
 
-    fun doGreedy(input: Input, params: FloatArray): Output {
+    fun doGreedy(input: Input, ridesToClosest: HashMap<Ride, Int>, params: FloatArray): Output {
         var tick = 0
         val carTakenUntil = IntArray(input.vehicles)
         val carPositions = Array(input.vehicles) { Point(0, 0) }
@@ -54,7 +63,6 @@ class GreedySolver(override val name: String = "shikasd.GreedySolver") : Solver 
                 val carPosition = carPositions[carIndex]
 
                 var maxIndex = -1
-                var firstValue = true
                 var maxValue = 0f
                 input.rides.forEachIndexed { index, ride ->
                     if (rideTaken[index]) return@forEachIndexed
@@ -63,27 +71,20 @@ class GreedySolver(override val name: String = "shikasd.GreedySolver") : Solver 
                     val actualStart = max(canStartAt, ride.startTime)
                     val canFinishAt = actualStart + ride.distance
 
-                    var score = 0f
+                    var score = -10e8f
                     if (canFinishAt <= ride.endTime) {
-                        val distance =
-                            if ((ride.end.x > 5000 || ride.end.y > 5000) && tick < input.timeLimit * params[4]) {
-                                1000
-                            } else {
-                                0
-                            }
-
+                        val countDistance = if (tick < input.timeLimit * params[4]) 1 else 0
                         val bonus = if (canStartAt <= ride.startTime) input.bonus else 0
 
                         val cost = ride.distance + bonus
                         val distanceToStart = carPosition.distanceTo(ride.start)
-                        val waitingTime = actualStart - canStartAt
-                        score = cost * params[0] - distanceToStart * params[1] - waitingTime * params[2] - distance * params[3]
+                        val waitingTime = max(actualStart - canStartAt, 0)
+                        score = cost * params[0] - distanceToStart * params[1] - waitingTime * params[2]
                     }
 
-                    if (firstValue || score > maxValue) {
+                    if (maxIndex == -1 || score > maxValue) {
                         maxValue = score
                         maxIndex = index
-                        firstValue = false
                     }
                 }
 
@@ -99,12 +100,7 @@ class GreedySolver(override val name: String = "shikasd.GreedySolver") : Solver 
                 )
                 carPositions[carIndex] = ride.end
             }
-            val nextTick = carTakenUntil.min() ?: tick + 1
-            if (nextTick <= tick) {
-                tick ++
-            } else {
-                tick = nextTick
-            }
+            tick++
         }
         return Output(handledRides)
     }

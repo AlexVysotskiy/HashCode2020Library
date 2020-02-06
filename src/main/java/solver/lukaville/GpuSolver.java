@@ -4,9 +4,8 @@ import common.Input;
 import common.Ride;
 import org.jocl.*;
 
-import java.util.List;
-
 import java.util.Arrays;
+import java.util.List;
 
 import static org.jocl.CL.*;
 
@@ -42,17 +41,20 @@ public class GpuSolver {
 
         final int[] srcArrayRides = new int[6 * input.getRides().size()];
         final List<Ride> rides = input.getRides();
-        for (int i = 0; i < rides.size(); i += 6) {
+        for (int i = 0; i < rides.size(); i++) {
             final Ride ride = rides.get(i);
-            srcArrayRides[i] = ride.getStart().getX();
-            srcArrayRides[i + 1] = ride.getStart().getY();
-            srcArrayRides[i + 2] = ride.getEnd().getX();
-            srcArrayRides[i + 3] = ride.getEnd().getY();
-            srcArrayRides[i + 4] = ride.getStartTime();
-            srcArrayRides[i + 5] = ride.getEndTime();
+            srcArrayRides[i * 6] = ride.getStart().getX();
+            srcArrayRides[i * 6 + 1] = ride.getStart().getY();
+            srcArrayRides[i * 6 + 2] = ride.getEnd().getX();
+            srcArrayRides[i * 6 + 3] = ride.getEnd().getY();
+            srcArrayRides[i * 6 + 4] = ride.getStartTime();
+            srcArrayRides[i * 6 + 5] = ride.getEndTime();
         }
 
         srcArrayGreedyParams = new float[greedyParamsCount * workItems];
+        for (int i = 0; i < greedyParamsCount * workItems; i++) {
+            srcArrayGreedyParams[i] = 1f;
+        }
 
         Pointer srcArrayCommonParamsPointer = Pointer.to(srcArrayCommonParams);
         Pointer srcArrayRidesPointer = Pointer.to(srcArrayRides);
@@ -65,7 +67,7 @@ public class GpuSolver {
         // that will be used
         final int platformIndex = 0;
         final long deviceType = CL_DEVICE_TYPE_ALL;
-        final int deviceIndex = 0;
+        final int deviceIndex = 2;
 
         // Enable exceptions and subsequently omit error checks in this sample
         CL.setExceptionsEnabled(true);
@@ -99,10 +101,11 @@ public class GpuSolver {
                 contextProperties, 1, new cl_device_id[]{device},
                 null, null, null);
 
+        int[] errRet = new int[1];
         // Create a command-queue for the selected device
-        cl_queue_properties properties = new cl_queue_properties();
-        commandQueue = clCreateCommandQueueWithProperties(
-                context, device, properties, null);
+        commandQueue = clCreateCommandQueue(
+                context, device, 0, errRet
+        );
 
         // Allocate the memory objects for the input- and output data
         srcMemCommonParams = clCreateBuffer(context,
@@ -136,6 +139,7 @@ public class GpuSolver {
         kernel = clCreateKernel(program, "solverKernel", null);
 
         System.out.println("MAX_WORK_GROUP_SIZE: " + getDeviceLong(device, CL_DEVICE_MAX_WORK_GROUP_SIZE));
+        System.out.println("DEVICE_NAME: " + getDeviceString(device, CL_DEVICE_NAME) + " \nDRIVER: " + getDeviceString(device, CL_DRIVER_VERSION));
     }
 
     private long getDeviceLong(cl_device_id device, int paramName) {
@@ -143,9 +147,22 @@ public class GpuSolver {
     }
 
     private long[] getDeviceLongs(cl_device_id device, int paramName, int numValues) {
-        long values[] = new long[numValues];
+        long[] values = new long[numValues];
         clGetDeviceInfo(device, paramName, Sizeof.cl_long * numValues, Pointer.to(values), null);
         return values;
+    }
+
+    private String getDeviceString(cl_device_id device, int paramName) {
+        // Obtain the length of the string that will be queried
+        long size[] = new long[1];
+        clGetDeviceInfo(device, paramName, 0, null, size);
+
+        // Create a buffer of the appropriate size and fill it with the info
+        byte buffer[] = new byte[(int)size[0]];
+        clGetDeviceInfo(device, paramName, buffer.length, Pointer.to(buffer), null);
+
+        // Create a string from the buffer (excluding the trailing \0 byte)
+        return new String(buffer, 0, buffer.length-1);
     }
 
     public void solve(float[][] params, int[] scoresOutput) {

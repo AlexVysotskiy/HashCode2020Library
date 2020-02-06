@@ -1,7 +1,7 @@
 __kernel void solverKernel(
-    __global const int *commonParams,
+    __constant const int *commonParams,
     __global const int *rides,
-    __global const float *greedyParams,
+    __constant const float *greedyParams,
     __global int *resultScores
 ) {
    int gid = get_global_id(0);
@@ -31,7 +31,7 @@ __kernel void solverKernel(
    __private int handledRidesResult[$rides_count$ * 2];
 
    __private int removedRides[$rides_count$];
-   for (int i = 0; i < ridesCount; i++) removedRides[i] = 0;
+   for (int i = 0; i < ridesCount; i++) removedRides[i] = false;
 
    while (tick < timeLimit) {
         for (int index = 0; index < vehicles; index++) {
@@ -43,9 +43,8 @@ __kernel void solverKernel(
 
             float maxScore = 0;
             int maxRideIndex = -1;
-
             for (int i = 0; i < ridesCount; i++) {
-               if (removedRides[i] == 1) continue;
+               if (removedRides[i] == true) continue;
 
                int startX = rides[i * 6];
                int startY = rides[i * 6 + 1];
@@ -55,19 +54,20 @@ __kernel void solverKernel(
                int endTime = rides[i * 6 + 5];
 
                int rideDistance = abs(startX - finishX) + abs(startY - finishY);
-
                int distanceFromCarToRideStart = abs(carPositionX - startX) + abs(carPositionY - startY);
-               int canStartAt = tick + distanceFromCarToRideStart;
-               int canFinishAt = canStartAt + rideDistance;
 
-               float score = 0;
+               int canStartAt = tick + distanceFromCarToRideStart;
+               int actualStart = max(canStartAt, startTime);
+               int canFinishAt = actualStart + rideDistance;
+
+               float score = -10e8;
                if (canFinishAt <= endTime) {
                     int rideBonus = 0;
                     if (canStartAt <= startTime) rideBonus = bonus;
-                    int actualStart = max(canStartAt, startTime);
+
                     int cost = rideDistance + rideBonus;
-                    int waitingTime = actualStart - canStartAt;
-                    score = (float) cost * a - (float) distanceFromCarToRideStart * b - (float) waitingTime * c;
+                    int waitingTime = max(actualStart - canStartAt, 0);
+                    score = cost * a - distanceFromCarToRideStart * b - waitingTime * c;
                }
 
                if (maxRideIndex == -1 || score > maxScore) {
@@ -75,6 +75,8 @@ __kernel void solverKernel(
                     maxRideIndex = i;
                }
             }
+
+//            printf("%d %d %d %f\n", removedRides[maxRideIndex], maxRideIndex, index, maxScore);
 
             if (maxRideIndex == -1) {
                 // no rides left
@@ -89,7 +91,9 @@ __kernel void solverKernel(
             int rideDistance = abs(startX - finishX) + abs(startY - finishY);
             int distanceFromCarToRideStart = abs(carPositionX - startX) + abs(carPositionY - startY);
 
-            removedRides[maxRideIndex] = 1;
+            removedRides[maxRideIndex] = true;
+//            printf("removed %d %d\n", maxRideIndex, index);
+
             carTakenUntil[index] = max(tick + distanceFromCarToRideStart, startTime) + rideDistance;
             carPositionsX[index] = finishX;
             carPositionsY[index] = finishY;
@@ -104,11 +108,19 @@ __kernel void solverKernel(
    for (int i = 0; i < vehicles; i++) carPositionsX[i] = 0;
    for (int i = 0; i < vehicles; i++) carPositionsY[i] = 0;
    for (int i = 0; i < vehicles; i++) carTakenUntil[i] = 0; // car time
+   for (int i = 0; i < ridesCount; i++) removedRides[i] = false;
 
    int totalScore = 0;
    for (int i = 0; i < handledRidesPosition; i++) {
         int rideIndex = handledRidesResult[i * 2];
         int carIndex = handledRidesResult[i * 2 + 1];
+
+        if (removedRides[rideIndex]) {
+            printf("ride taken twice %d", rideIndex);
+        }
+        removedRides[rideIndex] = true;
+
+//        printf("%d %d\n", rideIndex, carIndex);
 
         int carPositionX = carPositionsX[carIndex];
         int carPositionY = carPositionsY[carIndex];
@@ -147,5 +159,5 @@ __kernel void solverKernel(
         }
    }
 
-   resultScores[gid] = totalScore;
+   resultScores[gid] = handledRidesPosition;
 }

@@ -12,7 +12,7 @@ fun main(args: Array<String>) {
 //        InputFile(
 //            "inputs/a_example.in",
 //            "5742876508028928"
-//        ),
+//        )
 //        InputFile(
 //            "inputs/b_should_be_easy.in",
 //            "5651204726063104"

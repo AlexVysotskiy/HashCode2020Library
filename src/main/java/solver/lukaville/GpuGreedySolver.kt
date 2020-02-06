@@ -2,10 +2,11 @@ package solver.lukaville
 
 import common.*
 import kotlin.math.max
+import kotlin.system.measureTimeMillis
 
 class GpuGreedySolver(override val name: String = "lukaville.GreedySolver") : Solver {
 
-    private val workItems = 1024
+    private val workItems = 1
     private val greedyParamsCount = 3
 
     override fun solve(input: Input): Output {
@@ -18,11 +19,10 @@ class GpuGreedySolver(override val name: String = "lukaville.GreedySolver") : So
             FloatArray(3) { 1f }
         }
 
-        solver.solve(params, scoresOutput)
-
-        scoresOutput.forEach {
-            println("Computed score: $it")
+        val time = measureTimeMillis {
+            solver.solve(params, scoresOutput)
         }
+        println("Computation finished in ${time/1000}s")
 
         solver.terminate()
 
@@ -45,7 +45,7 @@ class GpuGreedySolver(override val name: String = "lukaville.GreedySolver") : So
                     val canStartAt = tick + carPosition.distanceTo(ride.start)
                     val canFinishAt = canStartAt + ride.distance
 
-                    if (canFinishAt > ride.endTime) return@maxBy 0f
+                    if (canFinishAt > ride.endTime) return@maxBy -10e8f
 
                     val bonus = if (canStartAt <= ride.startTime) input.bonus else 0
                     val actualStart = max(canStartAt, ride.startTime)
@@ -66,6 +66,7 @@ class GpuGreedySolver(override val name: String = "lukaville.GreedySolver") : So
             }
             tick++
         }
+
         return Output(handledRides)
     }
 }
