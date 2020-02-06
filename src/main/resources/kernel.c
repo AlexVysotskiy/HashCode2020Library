@@ -159,5 +159,5 @@ __kernel void solverKernel(
         }
    }
 
-   resultScores[gid] = handledRidesPosition;
+   resultScores[gid] = totalScore;
 }
