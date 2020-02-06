@@ -65,7 +65,7 @@ public class GpuSolver {
 
         // The platform, device type and device number
         // that will be used
-        final int platformIndex = 0;
+        final int platformIndex = 1;
         final long deviceType = CL_DEVICE_TYPE_ALL;
         final int deviceIndex = 0;
 
@@ -158,11 +158,11 @@ public class GpuSolver {
         clGetDeviceInfo(device, paramName, 0, null, size);
 
         // Create a buffer of the appropriate size and fill it with the info
-        byte buffer[] = new byte[(int)size[0]];
+        byte buffer[] = new byte[(int) size[0]];
         clGetDeviceInfo(device, paramName, buffer.length, Pointer.to(buffer), null);
 
         // Create a string from the buffer (excluding the trailing \0 byte)
-        return new String(buffer, 0, buffer.length-1);
+        return new String(buffer, 0, buffer.length - 1);
     }
 
     public void solve(float[][] params, int[] scoresOutput) {
@@ -173,6 +173,13 @@ public class GpuSolver {
                 k++;
             }
         }
+
+        clReleaseMemObject(srcMemGreedyParams);
+        Pointer srcArrayGreedyParamsPointer = Pointer.to(srcArrayGreedyParams);
+        srcMemGreedyParams = clCreateBuffer(context,
+                CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+                Sizeof.cl_float * srcArrayGreedyParams.length, srcArrayGreedyParamsPointer, null);
+        System.out.println("Wrote greedy params");
 
         // Set the arguments for the kernel
         int a = 0;
@@ -202,6 +209,7 @@ public class GpuSolver {
         // Release kernel, program, and memory objects
         clReleaseMemObject(srcMemCommonParams);
         clReleaseMemObject(srcMemRides);
+        clReleaseMemObject(srcMemGreedyParams);
         clReleaseMemObject(dstResultScoresMem);
         clReleaseKernel(kernel);
         clReleaseProgram(program);

@@ -3,15 +3,19 @@ package solver.shikasd
 import common.*
 import common.helpers.SwarmOptimizer
 import common.score.kotlin.ScoreCalculatorImpl
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executors
 import kotlin.math.max
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
 
 class GreedySolver(override val name: String = "shikasd.GreedySolver") : Solver {
 
+    private val scoreCalculator = ScoreCalculatorImpl()
+    private val executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())
+
     @ExperimentalTime
     override fun solve(input: Input): Output {
-        val scoreCalculator = ScoreCalculatorImpl()
 
         val ridesToClosest = HashMap<Ride, Int>()
         input.rides.forEach { initial ->
@@ -35,21 +39,25 @@ class GreedySolver(override val name: String = "shikasd.GreedySolver") : Solver 
                 initialXSpread = 2f,
                 parallelism = Runtime.getRuntime().availableProcessors()
             )
-        ) {
+        ) { params: Array<FloatArray>, outputScores: IntArray ->
             val time = measureTimedValue {
-                val output = doGreedy(input, ridesToClosest,  it)
-                scoreCalculator.calculateResult(input, output)
+                val latch = CountDownLatch(outputScores.size)
+                (outputScores.indices).forEach { workerIndex ->
+                    executor.submit {
+                        val output = doGreedy(input, ridesToClosest, params[workerIndex])
+                        val score = scoreCalculator.calculateResult(input, output)
+                        outputScores[workerIndex] = score.toInt()
+                        latch.countDown()
+                    }
+                }
+                latch.await()
             }
-
-//            println(time.duration.inMilliseconds)
-
-            time.value
         }
 
         return doGreedy(input, ridesToClosest, FloatArray(5) { 1f })
     }
 
-    fun doGreedy(input: Input, ridesToClosest: HashMap<Ride, Int>, params: FloatArray): Output {
+    private fun doGreedy(input: Input, ridesToClosest: HashMap<Ride, Int>, params: FloatArray): Output {
         var tick = 0
         val carTakenUntil = IntArray(input.vehicles)
         val carPositions = Array(input.vehicles) { Point(0, 0) }

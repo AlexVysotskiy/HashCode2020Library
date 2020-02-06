@@ -1,12 +1,13 @@
 package solver.lukaville
 
 import common.*
+import common.helpers.SwarmOptimizer
 import kotlin.math.max
 import kotlin.system.measureTimeMillis
 
 class GpuGreedySolver(override val name: String = "lukaville.GreedySolver") : Solver {
 
-    private val workItems = 1
+    private val workItems = 2048
     private val greedyParamsCount = 3
 
     override fun solve(input: Input): Output {
@@ -15,18 +16,35 @@ class GpuGreedySolver(override val name: String = "lukaville.GreedySolver") : So
         val scoresOutput = IntArray(workItems)
         solver.initialize(input, workItems, greedyParamsCount, scoresOutput)
 
-        val params = Array(workItems) {
-            FloatArray(3) { 1f }
+        println("Solver initialized")
+
+        val optimizer = SwarmOptimizer(
+            initialPosition = FloatArray(greedyParamsCount) { 1f },
+            params = SwarmOptimizer.Params(
+                c0 = 2f,
+                c1 = 2f,
+                initialInertia = 0.5f,
+                particleCount = workItems,
+                maxX = 10f,
+                minX = 0.1f,
+                maxIterationCount = 300,
+                initialXSpread = 2f,
+                parallelism = Runtime.getRuntime().availableProcessors()
+            )
+        ) { coeff: Array<FloatArray>, output: IntArray ->
+
+            val time = measureTimeMillis {
+                solver.solve(coeff, output)
+            }
+
+            println(time)
         }
 
-        val time = measureTimeMillis {
-            solver.solve(params, scoresOutput)
-        }
-        println("Computation finished in ${time/1000}s")
+        val bestOption = optimizer.solve()
 
         solver.terminate()
 
-        return doGreedy(input, FloatArray(3) { 1f })
+        return doGreedy(input, bestOption)
     }
 
     private fun doGreedy(input: Input, params: FloatArray): Output {
@@ -58,7 +76,8 @@ class GpuGreedySolver(override val name: String = "lukaville.GreedySolver") : So
 
                 val (rideIndex, ride) = nextRide
                 sortedRides.remove(nextRide)
-                carTakenUntil[index] = max(tick + carPosition.distanceTo(ride.start), nextRide.second.startTime) + ride.distance
+                carTakenUntil[index] =
+                    max(tick + carPosition.distanceTo(ride.start), nextRide.second.startTime) + ride.distance
                 handledRides.add(
                     HandledRide(rideIndex, index)
                 )
