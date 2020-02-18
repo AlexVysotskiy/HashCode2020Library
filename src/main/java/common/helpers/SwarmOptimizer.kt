@@ -12,7 +12,8 @@ import kotlin.system.measureTimeMillis
 class SwarmOptimizer(
     private val initialPosition: FloatArray,
     private val params: Params = Params(),
-    private val calculateScore: (Array<FloatArray>, IntArray) -> Unit
+    private val calculateScore: (FloatArray) -> Int,
+    private val saver: (FloatArray) -> Unit
 ) {
     @Volatile
     private var globalMaxValue: Int = 0
@@ -20,19 +21,12 @@ class SwarmOptimizer(
     fun solve(): FloatArray {
         val entryTime = System.currentTimeMillis()
 
-        val particlePositions = Array(params.particleCount) {
-            FloatArray(initialPosition.size) {
+        val particles = Array(params.particleCount) {
+            val position = FloatArray(initialPosition.size) {
                 val deviation = Random.nextFloat() * params.initialXSpread - params.initialXSpread / 2
                 (initialPosition[it] + deviation).clipTo(params.minX, params.maxX)
             }
-        }
-
-        val outputScores = IntArray(params.particleCount)
-
-        calculateScore(particlePositions, outputScores)
-
-        val particles = Array(params.particleCount) {
-            initParticle(particlePositions[it], outputScores[it])
+            initParticle(position, calculateScore(position))
         }
         val bestParticle = particles.maxBy { it.localMaxValue }!!
 
@@ -83,31 +77,29 @@ class SwarmOptimizer(
             }
 
             totalCalculate += measureTimeMillis {
-                particles.indices.forEach {
-                    val particle = particles[it]
-                    particlePositions[it] = particle.position
-                }
-            }
+                val latch = CountDownLatch(params.parallelism)
+                (0 until params.parallelism).forEach {
+                    executor.submit {
+                        val start = it * chunkSize
+                        val end = ((it + 1) * chunkSize)
+                        (start until end).forEach {
+                            val particle = particles[it]
+                            val outputScore = calculateScore(particle.position)
+                            if (outputScore > particle.localMaxValue) {
+                                particle.localMaxValue = outputScore
+                                particle.position.copyInto(particle.localMax)
+                            }
 
-            totalCalculate += measureTimeMillis {
-                calculateScore(particlePositions, outputScores)
-            }
-
-            totalCalculate += measureTimeMillis {
-                particles.indices.forEach {
-                    val particle = particles[it]
-                    val outputScore = outputScores[it]
-                    if (outputScores[it] > particle.localMaxValue) {
-                        particle.localMaxValue = outputScore
-                        particle.position.copyInto(particle.localMax)
-                    }
-
-                    if (outputScore > globalMaxValue) {
-                        globalMaxValue = outputScore
-                        particle.position.copyInto(globalMax)
-                        progressIterator.progressBar.extraMessage = ("Max: $globalMaxValue")
+                            if (outputScore > globalMaxValue) {
+                                globalMaxValue = outputScore
+                                particle.position.copyInto(globalMax)
+                                progressIterator.progressBar.extraMessage = ("Max: $globalMaxValue")
+                            }
+                        }
+                        latch.countDown()
                     }
                 }
+                latch.await()
             }
 
             inertia *= params.inertiaDecrement
