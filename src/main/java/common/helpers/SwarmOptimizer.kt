@@ -13,7 +13,7 @@ class SwarmOptimizer(
     private val initialPosition: FloatArray,
     private val params: Params = Params(),
     private val calculateScore: (FloatArray) -> Int,
-    private val saver: (FloatArray) -> Unit
+    private val saver: (FloatArray, expectedScore: Int) -> Unit
 ) {
     @Volatile
     private var globalMaxValue: Int = 0
@@ -102,6 +102,7 @@ class SwarmOptimizer(
                 latch.await()
             }
 
+            saver.invoke(globalMax, globalMaxValue)
             inertia *= params.inertiaDecrement
         }
 
