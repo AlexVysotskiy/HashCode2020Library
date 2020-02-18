@@ -12,15 +12,28 @@ import kotlin.system.measureTimeMillis
 class SwarmOptimizer(
     private val initialPosition: FloatArray,
     private val params: Params = Params(),
-    private val calculateScore: (FloatArray) -> Long
+    private val calculateScore: (Array<FloatArray>, IntArray) -> Unit
 ) {
     @Volatile
-    private var globalMaxValue: Long = 0
+    private var globalMaxValue: Int = 0
 
     fun solve(): FloatArray {
         val entryTime = System.currentTimeMillis()
 
-        val particles = Array(params.particleCount) { initParticle() }
+        val particlePositions = Array(params.particleCount) {
+            FloatArray(initialPosition.size) {
+                val deviation = Random.nextFloat() * params.initialXSpread - params.initialXSpread / 2
+                (initialPosition[it] + deviation).clipTo(params.minX, params.maxX)
+            }
+        }
+
+        val outputScores = IntArray(params.particleCount)
+
+        calculateScore(particlePositions, outputScores)
+
+        val particles = Array(params.particleCount) {
+            initParticle(particlePositions[it], outputScores[it])
+        }
         val bestParticle = particles.maxBy { it.localMaxValue }!!
 
         globalMaxValue = bestParticle.localMaxValue
@@ -70,29 +83,31 @@ class SwarmOptimizer(
             }
 
             totalCalculate += measureTimeMillis {
-                val latch = CountDownLatch(params.parallelism)
-                (0 until params.parallelism).forEach {
-                    executor.submit {
-                        val start = it * chunkSize
-                        val end = ((it + 1) * chunkSize)
-                        (start until end).forEach { i ->
-                            val particle = particles[i]
-                            val score = calculateScore(particle.position)
-                            if (score > particle.localMaxValue) {
-                                particle.localMaxValue = score
-                                particle.position.copyInto(particle.localMax)
-                            }
+                particles.indices.forEach {
+                    val particle = particles[it]
+                    particlePositions[it] = particle.position
+                }
+            }
 
-                            if (score > globalMaxValue) {
-                                globalMaxValue = score
-                                particle.position.copyInto(globalMax)
-                                progressIterator.progressBar.extraMessage = ("Max: $globalMaxValue")
-                            }
-                        }
-                        latch.countDown()
+            totalCalculate += measureTimeMillis {
+                calculateScore(particlePositions, outputScores)
+            }
+
+            totalCalculate += measureTimeMillis {
+                particles.indices.forEach {
+                    val particle = particles[it]
+                    val outputScore = outputScores[it]
+                    if (outputScores[it] > particle.localMaxValue) {
+                        particle.localMaxValue = outputScore
+                        particle.position.copyInto(particle.localMax)
+                    }
+
+                    if (outputScore > globalMaxValue) {
+                        globalMaxValue = outputScore
+                        particle.position.copyInto(globalMax)
+                        progressIterator.progressBar.extraMessage = ("Max: $globalMaxValue")
                     }
                 }
-                latch.await()
             }
 
             inertia *= params.inertiaDecrement
@@ -105,14 +120,10 @@ class SwarmOptimizer(
         return globalMax
     }
 
-    private fun initParticle(): Particle {
-        val position = FloatArray(initialPosition.size) {
-            val deviation = Random.nextFloat() * params.initialXSpread - params.initialXSpread / 2
-            (initialPosition[it] + deviation).clipTo(params.minX, params.maxX)
-        }
+    private fun initParticle(position: FloatArray, localMaxValue: Int): Particle {
         return Particle(
             localMax = position.copyOf(),
-            localMaxValue = calculateScore(position),
+            localMaxValue = localMaxValue,
             position = position,
             velocity =  FloatArray(initialPosition.size) { Random.nextFloat() * params.maxVelocity }
         )
@@ -123,7 +134,7 @@ class SwarmOptimizer(
 
     class Particle(
         val localMax: FloatArray,
-        var localMaxValue: Long,
+        var localMaxValue: Int,
         val position: FloatArray,
         val velocity: FloatArray
     )
