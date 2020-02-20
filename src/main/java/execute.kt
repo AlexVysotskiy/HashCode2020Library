@@ -31,6 +31,8 @@ fun executeSolver(inputs: List<InputFile>, solverFactory: () -> Solver) {
             writeOutputVisualization(input, output, "$inputFile.out.trace")
         }
 
+        // writeInputVisualization(input, output, "$inputFile.input.viz.csv")
+
         println("Score for $inputFile = $score")
 
         results.add(inp to output)
