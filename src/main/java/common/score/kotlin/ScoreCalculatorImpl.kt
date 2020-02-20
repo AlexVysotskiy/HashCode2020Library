@@ -1,9 +1,7 @@
 package common.score.kotlin
 
-import common.Book
-import common.Input
-import common.Output
-import common.ScoreCalculator
+import common.*
+import java.lang.IllegalArgumentException
 
 
 class ScoreCalculatorImpl : ScoreCalculator {
@@ -14,11 +12,15 @@ class ScoreCalculatorImpl : ScoreCalculator {
         var currentTime: Long = 0
 
         val solvedBooks = hashSetOf<Book>()
+        val solvedLibraries = hashSetOf<Library>()
 
         output.entries.forEach {
             val library = it.library
             val books = it.scannedBooks
 
+            if (library in solvedLibraries) throw IllegalArgumentException("Library ${library.id} was already scanned!")
+
+            solvedLibraries += library
             currentTime += library.signup
 
             var booksTime = currentTime
