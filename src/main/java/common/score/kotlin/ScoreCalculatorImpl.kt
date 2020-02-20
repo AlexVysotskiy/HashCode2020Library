@@ -31,7 +31,7 @@ class ScoreCalculatorImpl : ScoreCalculator {
                 .forEach { booksThisDay ->
                     booksTime++
 
-                    if (booksTime < input.days) {
+                    if (booksTime <= input.days) {
                         booksThisDay.forEach { book ->
                             if (book.id !in booksInLibrary) throw IllegalArgumentException("Book ${book.id} was not found in library ${library.id}")
 
