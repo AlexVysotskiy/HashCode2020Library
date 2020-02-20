@@ -10,13 +10,14 @@ fun writeInputVisualization(input: Input, output: Output, fileName: String) {
     file.writeText("")
     val writer = file.writer()
     input
-        .books
-        .map { it.score.toDouble() }
+        .libraries
+        .map { it.signup.toDouble() }
         .toPercentileDistribution()
         .map { it.x.toString() + "\t" + it.y.toString() }
         .forEach {
             writer.write(it + "\n")
         }
+    writer.close()
 }
 
 class Point(
