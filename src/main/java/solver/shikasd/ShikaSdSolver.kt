@@ -34,7 +34,7 @@ class ShikaSdSolver(override val name: String = "shikasd.GreedySolver") : Solver
     }
 
     private fun findLibrary(libraries: MutableList<Library>, takenBooks: BooleanArray, tick: Int, deadline: Int): Library =
-        libraries.minBy {
+        libraries.maxBy {
             val newBooks = it.books.count { !takenBooks[it.id] }
             val q = newBooks.toFloat()
             val v = it.shippingRate
@@ -42,8 +42,9 @@ class ShikaSdSolver(override val name: String = "shikasd.GreedySolver") : Solver
             val d = deadline
             val r = it.signup
             val c = tick
+            val k = 1 - min(r / (d - c).toFloat(), 1f)
 
-            val score = (min(v / q, 1f) * s) * (min(ceil(q / v).toInt(), d - r - c))
+            val score = (min(v / q, 1f) * s) * (min(ceil(q / v).toInt(), d - r - c)) * k
             score
         }!!
 }
