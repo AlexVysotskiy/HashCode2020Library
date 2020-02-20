@@ -18,6 +18,8 @@ class ScoreCalculatorImpl : ScoreCalculator {
             val library = it.library
             val books = it.scannedBooks
 
+            val booksInLibrary = it.library.books.mapTo(hashSetOf()) { it.id }
+
             if (library in solvedLibraries) throw IllegalArgumentException("Library ${library.id} was already scanned!")
 
             solvedLibraries += library
@@ -31,6 +33,8 @@ class ScoreCalculatorImpl : ScoreCalculator {
 
                     if (booksTime < input.days) {
                         booksThisDay.forEach { book ->
+                            if (book.id !in booksInLibrary) throw IllegalArgumentException("Book ${book.id} was not found in library ${library.id}")
+
                             if (!solvedBooks.contains(book)) {
                                 result += book.score
                             } else {
