@@ -1,9 +1,11 @@
 import common.InputFile
 import common.Solver
+import solver.lukaville.LukavilleSolver
 
 fun main(args: Array<String>) {
 
     val solvers = listOf<() -> Solver>(
+        { LukavilleSolver() }
     )
 
     val inputFiles = listOf(
@@ -12,19 +14,23 @@ fun main(args: Array<String>) {
             "5742876508028928"
         ),
         InputFile(
-            "inputs/b_should_be_easy.in",
+            "inputs/b_read_on.in",
             "5651204726063104"
         ),
         InputFile(
-            "inputs/c_no_hurry.in",
+            "inputs/c_incunabula.in",
             "5680006004998144"
         ),
         InputFile(
-            "inputs/d_metropolis.in",
+            "inputs/d_tough_choices.in",
             "5654843402223616"
         ),
         InputFile(
-            "inputs/e_high_bonus.in",
+            "inputs/e_so_many_books.in",
+            "5649463653695488"
+        ),
+        InputFile(
+            "inputs/f_libraries_of_the_world.in",
             "5649463653695488"
         )
     )
