@@ -1,16 +1,15 @@
 package plot.gui;
 
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-
-import javax.swing.JSlider;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import net.ericaro.surfaceplotter.JSurfacePanel;
 import net.ericaro.surfaceplotter.Mapper;
 import net.ericaro.surfaceplotter.ProgressiveSurfaceModel;
+
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 
 public class Chart3D implements ChangeListener{
 
@@ -40,13 +39,13 @@ public class Chart3D implements ChangeListener{
 	}
 
 	public void setModelMapperSample1(){
-		final SolutionMapper mapper = new SolutionMapper();
-
-		model = new ProgressiveSurfaceModel();
-
-		model.setMapper(mapper);
-		model.plot().execute();
-		surfacePanel.setModel(model);
+//		final SolutionMapper mapper = new SolutionMapper();
+//
+//		model = new ProgressiveSurfaceModel();
+//
+//		model.setMapper(mapper);
+//		model.plot().execute();
+//		surfacePanel.setModel(model);
 	}
 
 	public void setModelMapperSample2(){
