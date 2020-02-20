@@ -25,8 +25,8 @@ fun writeOutputVisualization(input: Input, output: Output, fileName: String) {
         currentTime += library.signup
 
         traceEvents += TraceEvent(
-            pid = 0,
-            tid = libraryNumber.toLong(),
+            pid = libraryNumber.toLong(),
+            tid = 0,
             ph = Phase.DurationStart,
             name = library.id.toString() + "_signup",
             ts = (currentTime - library.signup).toDouble(),
@@ -34,8 +34,8 @@ fun writeOutputVisualization(input: Input, output: Output, fileName: String) {
             cat = "signup"
         )
         traceEvents += TraceEvent(
-            pid = 0,
-            tid = libraryNumber.toLong(),
+            pid = libraryNumber.toLong(),
+            tid = 0,
             ph = Phase.DurationEnd,
             name = library.id.toString() + "_signup",
             ts = currentTime.toDouble()
@@ -44,15 +44,15 @@ fun writeOutputVisualization(input: Input, output: Output, fileName: String) {
         var booksTime = currentTime
         books
             .chunked(library.shippingRate)
-            .forEach { booksThisDay ->
+            .forEachIndexed { index, booksThisDay ->
                 booksTime++
 
                 var scored = booksTime <= input.days
                 booksThisDay.forEach { book ->
                     scored = scored && !solvedBooks.contains(book)
                     traceEvents += TraceEvent(
-                        pid = 0,
-                        tid = libraryNumber.toLong(),
+                        pid = libraryNumber.toLong(),
+                        tid = index.toLong(),
                         ph = Phase.DurationStart,
                         name = book.id.toString(),
                         ts = booksTime.toDouble() - 1,
@@ -64,8 +64,8 @@ fun writeOutputVisualization(input: Input, output: Output, fileName: String) {
                         )
                     )
                     traceEvents += TraceEvent(
-                        pid = 0,
-                        tid = libraryNumber.toLong(),
+                        pid = libraryNumber.toLong(),
+                        tid = index.toLong(),
                         ph = Phase.DurationEnd,
                         name = book.id.toString(),
                         ts = booksTime.toDouble(),
@@ -73,7 +73,6 @@ fun writeOutputVisualization(input: Input, output: Output, fileName: String) {
                     )
                 }
             }
-
 
         val traceRoot = TraceRoot(
             traceEvents = traceEvents,
