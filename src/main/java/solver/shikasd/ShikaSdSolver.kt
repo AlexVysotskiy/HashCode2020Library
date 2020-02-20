@@ -1,11 +1,29 @@
 package solver.shikasd
 
 import common.*
+import common.helpers.SwarmOptimizer
+import common.score.kotlin.ScoreCalculatorImpl
 import kotlin.math.ceil
 import kotlin.math.min
 
 class ShikaSdSolver(override val name: String = "shikasd.GreedySolver") : Solver {
     override fun solve(input: Input): Output {
+        val calculator = ScoreCalculatorImpl()
+        val solution = SwarmOptimizer(
+            FloatArray(4) { 1f },
+            SwarmOptimizer.Params(
+                maxIterationCount = 100,
+                particleCount = 50,
+                maxX = 100f
+            ),
+            calculateScore = { calculator.calculateResult(input, doSolve(input, it)).toInt() },
+            saver = { params, score -> println(params.toList()) }
+        )
+
+        return doSolve(input, solution.solve())
+    }
+
+    private fun doSolve(input: Input, params: FloatArray): Output {
         val takenBooks = BooleanArray(input.books.size)
         var booksLeft = input.books.size
         val libraries = ArrayList(input.libraries)
@@ -13,7 +31,7 @@ class ShikaSdSolver(override val name: String = "shikasd.GreedySolver") : Solver
 
         var tick = 0
         while (booksLeft > 0 && libraries.isNotEmpty()) {
-            val nextLibrary = findLibrary(libraries, takenBooks, tick, input.days)
+            val nextLibrary = findLibrary(libraries, takenBooks, tick, input.days, params)
             libraries.remove(nextLibrary)
             val daysLeft = input.days - (tick + nextLibrary.signup)
             val canRead = Math.max(0, daysLeft * nextLibrary.shippingRate)
@@ -44,7 +62,7 @@ class ShikaSdSolver(override val name: String = "shikasd.GreedySolver") : Solver
         return Output(result)
     }
 
-    private fun findLibrary(libraries: MutableList<Library>, takenBooks: BooleanArray, tick: Int, deadline: Int): Library {
+    private fun findLibrary(libraries: MutableList<Library>, takenBooks: BooleanArray, tick: Int, deadline: Int, params: FloatArray): Library {
         var maxLibrary: Library? = null
         var maxScore = Float.NEGATIVE_INFINITY
         for (i in libraries.indices) {
@@ -58,15 +76,15 @@ class ShikaSdSolver(override val name: String = "shikasd.GreedySolver") : Solver
                     newBooksCount++
                 }
             }
-            val q = newBooksCount.toFloat()
-            val v = library.shippingRate
-            val s = newBooksSum
+            val q = newBooksCount.toFloat() * params[2]
+            val v = library.shippingRate * params[3]
+            val s = newBooksSum * params[1]
             val d = deadline
-            val r = library.signup
+            val r = library.signup * params[0]
             val c = tick
             val k = 1 - min(r / (d - c).toFloat(), 1f)
 
-            val score = (min(v / q, 1f) * s) * (min(ceil(q / v).toInt(), d - r - c)) * k
+            val score = (min(v / q, 1f) * s) * (min(ceil(q / v).toInt(), d - r.toInt() - c)) * k
             if (score > maxScore) {
                 maxScore = score
                 maxLibrary = library
