@@ -12,6 +12,7 @@ data class Book(
 )
 
 data class Library(
+    val id: Int,
     val signup: Int,
     val shippingRate: Int,
     val books: List<Book>
