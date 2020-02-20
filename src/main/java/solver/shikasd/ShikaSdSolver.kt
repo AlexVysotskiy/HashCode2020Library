@@ -15,7 +15,7 @@ class ShikaSdSolver(override val name: String = "shikasd.GreedySolver") : Solver
         while (booksLeft > 0 && libraries.isNotEmpty()) {
             val nextLibrary = findLibrary(libraries, takenBooks, tick, input.days)
             libraries.remove(nextLibrary)
-            val scannedBooks = nextLibrary.books.filter { !takenBooks[it.id] }
+            val scannedBooks = nextLibrary.books.filter { !takenBooks[it.id] }.sortedBy { -it.score }
             scannedBooks.forEach { takenBooks[it.id] = true }
             if (scannedBooks.isEmpty()) {
                 continue
