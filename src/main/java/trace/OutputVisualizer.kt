@@ -17,16 +17,16 @@ fun writeOutputVisualization(input: Input, output: Output, fileName: String) {
     val solvedBooks = hashSetOf<Book>()
     val solvedLibraries = hashSetOf<Library>()
 
-    output.entries.forEach {
-        val library = it.library
-        val books = it.scannedBooks
+    output.entries.forEachIndexed { libraryNumber, entry ->
+        val library = entry.library
+        val books = entry.scannedBooks
 
         solvedLibraries += library
         currentTime += library.signup
 
         traceEvents += TraceEvent(
             pid = 0,
-            tid = library.id.toLong(),
+            tid = libraryNumber.toLong(),
             ph = Phase.DurationStart,
             name = library.id.toString() + "_signup",
             ts = (currentTime - library.signup).toDouble(),
@@ -35,7 +35,7 @@ fun writeOutputVisualization(input: Input, output: Output, fileName: String) {
         )
         traceEvents += TraceEvent(
             pid = 0,
-            tid = library.id.toLong(),
+            tid = libraryNumber.toLong(),
             ph = Phase.DurationEnd,
             name = library.id.toString() + "_signup",
             ts = currentTime.toDouble()
@@ -52,19 +52,20 @@ fun writeOutputVisualization(input: Input, output: Output, fileName: String) {
                     scored = scored && !solvedBooks.contains(book)
                     traceEvents += TraceEvent(
                         pid = 0,
-                        tid = library.id.toLong(),
+                        tid = libraryNumber.toLong(),
                         ph = Phase.DurationStart,
                         name = book.id.toString(),
                         ts = booksTime.toDouble() - 1,
                         cname = if (scored) "good" else "bad",
                         cat = if (scored) "scored" else "not_scored",
                         args = mapOf(
-                            "score" to book.score.toString()
+                            "score" to book.score.toString(),
+                            "library_id" to library.id.toString()
                         )
                     )
                     traceEvents += TraceEvent(
                         pid = 0,
-                        tid = library.id.toLong(),
+                        tid = libraryNumber.toLong(),
                         ph = Phase.DurationEnd,
                         name = book.id.toString(),
                         ts = booksTime.toDouble(),
