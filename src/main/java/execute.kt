@@ -1,5 +1,6 @@
 import common.*
 import common.score.kotlin.ScoreCalculatorImpl
+import trace.writeOutputVisualization
 import uploader.Uploader
 import java.io.File
 
@@ -12,6 +13,7 @@ fun executeSolver(inputs: List<InputFile>, solverFactory: () -> Solver) {
     val resultCalculator = ScoreCalculatorImpl()
 
     val results = mutableListOf<Pair<InputFile, Output>>()
+    val writeTrace = false
 
     val totalScore = inputs.map { inp ->
         val solver = solverFactory()
@@ -24,6 +26,10 @@ fun executeSolver(inputs: List<InputFile>, solverFactory: () -> Solver) {
         Writer.write(output, outputFile.outputStream())
 
         val score = resultCalculator.calculateResult(input, output)
+
+        if (writeTrace) {
+            writeOutputVisualization(input, output, "$inputFile.out.trace")
+        }
 
         println("Score for $inputFile = $score")
 
