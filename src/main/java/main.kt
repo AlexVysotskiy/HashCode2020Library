@@ -11,27 +11,27 @@ fun main(args: Array<String>) {
     val inputFiles = listOf(
 //        InputFile(
 //            "inputs/a_example.txt",
-//            "4653688085807104"
+//            "5691439912583168"
 //        ),
 //        InputFile(
 //            "inputs/b_read_on.txt",
-//            "5801757154213888"
+//            "6588393567813632"
 //        ),
 //        InputFile(
 //            "inputs/c_incunabula.txt",
-//            "5901915321794560"
-//        )
+//            "5367802785431552"
+//        ),
 //        InputFile(
 //            "inputs/d_tough_choices.txt",
-//            "5056706962784256"
+//            "6688877079166976"
 //        ),
         InputFile(
             "inputs/e_so_many_books.txt",
-            "6542451846152192"
+            "5804289507196928"
         )
 //        InputFile(
 //            "inputs/f_libraries_of_the_world.txt",
-//            "6288955762802688"
+//            "4595015879753728"
 //        )
     )
 

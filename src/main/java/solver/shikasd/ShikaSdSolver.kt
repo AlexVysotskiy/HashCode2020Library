@@ -20,7 +20,9 @@ class ShikaSdSolver(override val name: String = "shikasd.GreedySolver") : Solver
             saver = { params, score -> println(params.toList()) }
         )
 
-        return doSolve(input, solution.solve())
+
+//        return doSolve(input, solution.solve())
+        return doSolve(input, floatArrayOf(3.918113f, 2.9230165f, 2.7732782f, 4.474831f))
     }
 
     private fun doSolve(input: Input, params: FloatArray): Output {
@@ -76,7 +78,7 @@ class ShikaSdSolver(override val name: String = "shikasd.GreedySolver") : Solver
                     newBooksCount++
                 }
             }
-            val q = newBooksCount.toFloat() * params[2]
+            val q = newBooksCount * params[2]
             val v = library.shippingRate * params[3]
             val s = newBooksSum * params[1]
             val d = deadline
@@ -84,7 +86,7 @@ class ShikaSdSolver(override val name: String = "shikasd.GreedySolver") : Solver
             val c = tick
             val k = 1 - min(r / (d - c).toFloat(), 1f)
 
-            val score = (min(v / q, 1f) * s) * (min(ceil(q / v).toInt(), d - r.toInt() - c)) * k
+            val score = (min(v / q, 1f) * s) * (min(ceil(q / v).toInt(), d - r.toInt() - c)) * k * k * k * (1 / r) * q
             if (score > maxScore) {
                 maxScore = score
                 maxLibrary = library
