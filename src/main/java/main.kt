@@ -1,11 +1,11 @@
 import common.InputFile
 import common.Solver
-import solver.shikasd.ShikaSdSolver
+import solver.TaskSolver
 
 fun main(args: Array<String>) {
 
     val solvers = listOf<() -> Solver>(
-        { ShikaSdSolver() }
+        { TaskSolver() }
     )
 
     val inputFiles = listOf(

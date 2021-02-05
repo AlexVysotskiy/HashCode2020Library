@@ -1,4 +1,4 @@
-package solver.shikasd
+package solver
 
 import common.*
 import common.helpers.SwarmOptimizer
@@ -6,7 +6,7 @@ import common.score.kotlin.ScoreCalculatorImpl
 import kotlin.math.ceil
 import kotlin.math.min
 
-class ShikaSdSolver(override val name: String = "shikasd.GreedySolver") : Solver {
+class TaskSolver(override val name: String = "GreedySolver") : Solver {
     override fun solve(input: Input): Output {
         val calculator = ScoreCalculatorImpl()
         val solution = SwarmOptimizer(
